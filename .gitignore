@@ -35,3 +35,6 @@ build/
 
 ### POSTGRES VOLUME ###
 /postgres_data
+
+### env data ###
+.env
