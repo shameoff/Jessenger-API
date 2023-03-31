@@ -1,0 +1,25 @@
+server:
+  port: 7070
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6666/JavaLab1
+    username: user
+    password: passwd
+
+  jpa:
+    generate-ddl: true # Делаем так, чтобы Spring сам управлял сущностями БД
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+
+  mvc: # Чтобы работали HTTP методы PUT, PATCH, DELETE
+    hiddenmethod:
+      filter:
+        enabled: true
