@@ -2,8 +2,13 @@
 GET http://localhost:7070/hello
 
 ###
-GET http://localhost:7070/profile/login
+POST http://localhost:7070/api/users/login
+Content-Type: application/json
 
+{
+    "login": "Kurdasdfdswa",
+    "password": "huyasword"
+}
 
 ###
 POST http://localhost:7070/api/users/register

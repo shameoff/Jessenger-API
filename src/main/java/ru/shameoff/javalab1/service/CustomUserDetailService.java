@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.shameoff.javalab1.entity.UserEntity;
 import ru.shameoff.javalab1.repositories.UserRepository;
+import ru.shameoff.javalab1.security.CustomUserDetails;
 
 import java.util.Collections;
 
@@ -24,6 +25,6 @@ public class CustomUserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findByLogin(username).orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
-        return new User(userEntity.getLogin(), userEntity.getPassword(), Collections.emptyList());
+        return new CustomUserDetails(userEntity);
     }
 }

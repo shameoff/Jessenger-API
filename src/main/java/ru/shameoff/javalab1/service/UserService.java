@@ -5,6 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +18,7 @@ import ru.shameoff.javalab1.dto.RegisterDto;
 import ru.shameoff.javalab1.dto.UserDto;
 import ru.shameoff.javalab1.entity.UserEntity;
 import ru.shameoff.javalab1.repositories.UserRepository;
+import ru.shameoff.javalab1.security.CustomUserDetails;
 
 import java.util.UUID;
 
@@ -23,9 +29,15 @@ public class UserService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
     @Transactional
-    public UserDto login(LoginDto loginDto) {
-        return new UserDto();
+    public ResponseEntity login(LoginDto loginDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getLogin(), loginDto.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        var user = ((CustomUserDetails) authentication.getPrincipal()).getUser();
+        System.out.println(user);
+        return new ResponseEntity(modelMapper.map(user,UserDto.class), HttpStatus.OK);
     }
     @Transactional
     public UserDto retrieveInfo() {
