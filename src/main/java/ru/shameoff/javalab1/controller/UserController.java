@@ -1,28 +1,27 @@
 package ru.shameoff.javalab1.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import ru.shameoff.javalab1.dto.CreateUpdateUserDto;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.shameoff.javalab1.dto.LoginDto;
+import ru.shameoff.javalab1.dto.RegisterDto;
 import ru.shameoff.javalab1.dto.UserDto;
 import ru.shameoff.javalab1.service.UserService;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/users")
 public class UserController {
-
 
     private final UserService userService;
 
     @PostMapping("/login")
-    public String login(){
-        String token = "";
-        token = "REPLACE ME";
-
-        return token;
+    public UserDto login(@RequestBody LoginDto loginDto) {
+        return userService.login(loginDto);
+    }
+    @GetMapping("/profile")
+    public UserDto showProfile(){
+        return userService.retrieveInfo();
     }
 
     @PostMapping("/logout")
@@ -32,8 +31,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public UserDto register(@RequestBody CreateUpdateUserDto createUpdateUserDto){
-        return userService.register(createUpdateUserDto);
+    public ResponseEntity register(@RequestBody RegisterDto registerDto){
+        return userService.register(registerDto);
     }
     @GetMapping("/hello")
     public String hello(){

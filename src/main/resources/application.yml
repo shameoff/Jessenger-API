@@ -1,5 +1,7 @@
 server:
   port: 7070
+  servlet:
+    context-path: "/api"
 
 spring:
   devtools:
@@ -8,9 +10,9 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:6666/JavaLab1
-    username: user
-    password: passwd
+    url: "jdbc:postgresql://localhost:6666/JavaLab1"
+    username: "user"
+    password: "passwd"
 
   jpa:
     generate-ddl: true # Делаем так, чтобы Spring сам управлял сущностями БД

@@ -1,7 +1,9 @@
 package ru.shameoff.javalab1;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class JavaLab1Application {
@@ -10,4 +12,8 @@ public class JavaLab1Application {
         SpringApplication.run(JavaLab1Application.class, args);
     }
 
+    @Bean
+    public ModelMapper modelMapper(){
+        return new ModelMapper();
+    }
 }

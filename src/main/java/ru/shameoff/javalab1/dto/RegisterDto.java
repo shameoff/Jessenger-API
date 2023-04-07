@@ -5,21 +5,25 @@ import lombok.*;
 import java.util.Date;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @RequiredArgsConstructor
-public class UserDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class RegisterDto {
 
-    @NonNull
-    private String id;
     @NonNull
     private String login;
     @NonNull
     private String email;
     @NonNull
+    private String password;
+    @NonNull
     private String firstMiddleLastName;
+
     private Date birthDate;
     private String phoneNumber;
     private String city;
     private String avatarUuid;
 }
+
+
+

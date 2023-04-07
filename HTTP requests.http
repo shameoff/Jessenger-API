@@ -6,13 +6,11 @@ GET http://localhost:7070/profile/login
 
 
 ###
-POST http://localhost:7070/register
+POST http://localhost:7070/api/users/register
 Content-Type: application/json
 
 {
   "login": "login",
-  "firstName": "firstName",
-  "middleName": "middleName",
-  "lastName": "lastName",
-  "birthDate": "2003-03-16"
+  "firstMiddleLastName": "firstName",
+  "password": "pass"
 }
