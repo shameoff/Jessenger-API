@@ -1,6 +1,7 @@
 package ru.shameoff.javalab1.service;
 
 
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -13,13 +14,17 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import ru.shameoff.javalab1.dto.LoginDto;
 import ru.shameoff.javalab1.dto.RegisterDto;
 import ru.shameoff.javalab1.dto.UserDto;
 import ru.shameoff.javalab1.entity.UserEntity;
 import ru.shameoff.javalab1.repositories.UserRepository;
 import ru.shameoff.javalab1.security.CustomUserDetails;
+import ru.shameoff.javalab1.security.props.SecurityJwtTokenProps;
+import ru.shameoff.javalab1.security.props.SecurityProps;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -34,6 +39,12 @@ public class UserService {
     public ResponseEntity login(LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getLogin(), loginDto.getPassword()));
+
+        String token = Jwts.builder()
+                        .setSubject(authentication.getName())
+                                .setExpiration(new Date(System.currentTimeMillis() + ))
+
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         var user = ((CustomUserDetails) authentication.getPrincipal()).getUser();
         System.out.println(user);
@@ -73,8 +84,11 @@ public class UserService {
                 registerDto.getCity(),
                 registerDto.getAvatarUuid()
         );
-
-        var registeredUser = userRepository.save(user);
+        try {
+        var registeredUser = userRepository.save(user);}
+        catch (Exception e) {
+            ;
+        }
         return new ResponseEntity<>(modelMapper.map(registeredUser, UserDto.class), HttpStatus.OK);
     }
 }
