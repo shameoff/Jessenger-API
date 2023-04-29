@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  db_users:
+    image: postgres:14
+    container_name: db_users_messenger
+    ports:
+      - "6666:5432"
+    environment:
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "passwd"
+      POSTGRES_DB: "JavaLab1"
+    volumes:
+      - "./postgres_data:/var/lib/postgresql"
