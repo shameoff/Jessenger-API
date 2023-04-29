@@ -27,6 +27,7 @@ spring:
     url: "jdbc:postgresql://localhost:6666/JavaLab1"
     username: "user"
     password: "passwd"
+  flyway:
 
   jpa:
     generate-ddl: true # Делаем так, чтобы Spring сам управлял сущностями БД

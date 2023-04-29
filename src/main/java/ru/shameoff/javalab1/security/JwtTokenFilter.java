@@ -39,15 +39,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(jwt);
-            var idStr = String.valueOf(data.getBody().getId());
             userData = new JwtUserData(
-                    idStr == null ? null : UUID.fromString(idStr),
-                    String.valueOf(data.getBody().get("login")),
-                    String.valueOf(data.getBody().get("name"))
+                    data.getBody().getId(),
+                    (String) data.getBody().get("login"),
+                    (String) data.getBody().get("name")
             );
         } catch (JwtException e) {
             // if token isn't valid or expired
-            throw new UnauthorizedException();
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return;
         }
 
         var authentication = new JwtAuthentication(userData);
