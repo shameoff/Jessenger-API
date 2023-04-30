@@ -2,11 +2,13 @@ package ru.shameoff.javalab1.dto;
 
 import lombok.*;
 
-@Data
-@RequiredArgsConstructor
+import javax.validation.constraints.NotNull;
+
+@AllArgsConstructor
+@Getter
 public class LoginDto {
-    @NonNull
-    private String login;
-    @NonNull
-    private String password;
+    @NotNull
+    private final String login;
+    @NotNull
+    private final String password;
 }

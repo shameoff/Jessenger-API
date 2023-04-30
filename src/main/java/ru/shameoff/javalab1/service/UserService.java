@@ -19,63 +19,74 @@ import ru.shameoff.javalab1.dto.RegisterDto;
 import ru.shameoff.javalab1.dto.UserDto;
 import ru.shameoff.javalab1.entity.UserEntity;
 import ru.shameoff.javalab1.repositories.UserRepository;
-import ru.shameoff.javalab1.security.CustomUserDetails;
-import ru.shameoff.javalab1.security.props.SecurityJwtTokenProps;
+import ru.shameoff.javalab1.security.props.SecurityProps;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
 
 import static ru.shameoff.javalab1.security.SecurityConstants.HEADER_AUTH;
+import static ru.shameoff.javalab1.security.SecurityConstants.TOKEN_PREFIX;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final SecurityJwtTokenProps jwtTokenProps;
+    private final SecurityProps securityProps;
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    @Transactional
-    public ResponseEntity<?> login(LoginDto loginDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getLogin(), loginDto.getPassword()));
+    private String generateToken(Authentication authentication){
+        var signKey = Keys.hmacShaKeyFor(securityProps.getJwtTokenProps().getSecret().getBytes(StandardCharsets.UTF_8));
+        var expiration = new Date(System.currentTimeMillis() + securityProps.getJwtTokenProps().getExpiration());
 
-        var signKey = Keys.hmacShaKeyFor(jwtTokenProps.getSecret().getBytes(StandardCharsets.UTF_8));
-
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(authentication.getName())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenProps.getExpiration()))
+                .setExpiration(expiration)
                 .signWith(signKey)
                 .compact();
+    }
+    @Transactional
+    public ResponseEntity<?> login(LoginDto loginDto) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDto.getLogin(), loginDto.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        var user = ((CustomUserDetails) authentication.getPrincipal()).getUser();
-        return ResponseEntity.ok()
-                .header(HEADER_AUTH, token)
-                .body(modelMapper.map(user, UserDto.class));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            var user = (UserEntity) authentication.getPrincipal();
+            return ResponseEntity.ok()
+                    .header(HEADER_AUTH, TOKEN_PREFIX + generateToken(authentication))
+                    .body(modelMapper.map(user, UserDto.class));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("");
+        }
     }
 
     @Transactional
     public UserDto retrieveInfo() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        User user = (User) authentication.getPrincipal();
-//        UserEntity userEntity = user;
-//        return new UserDto(
-//                userEntity.getId(),
-//                userEntity.getLogin(),
-//                userEntity.getEmail(),
-//                userEntity.getFirstMiddleLastName(),
-//                userEntity.getBirthDate(),
-//                userEntity.getPhoneNumber(),
-//                userEntity.getCity(),
-//                userEntity.getAvatarUuid()
-//        );
-        return new UserDto();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserEntity userEntity = (UserEntity) authentication.getPrincipal();
+        return new UserDto(
+                userEntity.getId(),
+                userEntity.getLogin(),
+                userEntity.getEmail(),
+                userEntity.getFirstMiddleLastName(),
+                userEntity.getBirthDate(),
+                userEntity.getPhoneNumber(),
+                userEntity.getCity(),
+                userEntity.getAvatarUuid()
+        );
     }
 
+    public ResponseEntity<?> updateInfo(UserDto userDto) {
+        if (userRepository.existsUserByLogin(userDto.getLogin())) {
+            return ResponseEntity.badRequest().body("User with this login already exists!");
+        }
+        return ResponseEntity.ok("Temp");
+    }
     @Transactional
     public ResponseEntity<?> register(RegisterDto registerDto) {
         if (userRepository.existsUserByLogin(registerDto.getLogin())) {
@@ -96,6 +107,6 @@ public class UserService {
                 registerDto.getAvatarUuid()
         );
         var registeredUser = userRepository.save(user);
-        return new ResponseEntity<>(modelMapper.map(registeredUser, UserDto.class), HttpStatus.OK);
+        return ResponseEntity.ok().body(modelMapper.map(registeredUser, UserDto.class));
     }
 }

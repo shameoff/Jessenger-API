@@ -19,9 +19,4 @@ public class JavaLab1Application {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
-
-    @Bean
-    SecurityProps securityProps() {
-        return new SecurityProps();
-    }
 }

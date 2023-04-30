@@ -2,27 +2,26 @@ package ru.shameoff.javalab1.dto;
 
 import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
-@RequiredArgsConstructor
 @AllArgsConstructor
-@NoArgsConstructor
 public class RegisterDto {
 
-    @NonNull
-    private String login;
-    @NonNull
-    private String email;
-    @NonNull
-    private String password;
-    @NonNull
-    private String firstMiddleLastName;
+    @NotNull
+    private final String login;
+    @NotNull
+    private final String email;
+    @NotNull
+    private final String password;
+    @NotNull
+    private final String firstMiddleLastName;
+    private final Date birthDate;
+    private final String phoneNumber;
+    private final String city;
+    private final String avatarUuid;
 
-    private Date birthDate;
-    private String phoneNumber;
-    private String city;
-    private String avatarUuid;
 }
 
 

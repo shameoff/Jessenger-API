@@ -2,21 +2,21 @@ package ru.shameoff.javalab1.dto;
 
 import lombok.*;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class UserDto {
 
-    @NonNull
+    @NotNull
     private String id;
-    @NonNull
+    @NotNull
     private String login;
-    @NonNull
+    @Email
     private String email;
-    @NonNull
     private String firstMiddleLastName;
     private Date birthDate;
     private String phoneNumber;

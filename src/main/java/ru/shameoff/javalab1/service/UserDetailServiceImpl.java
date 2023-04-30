@@ -1,7 +1,6 @@
 package ru.shameoff.javalab1.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,15 +9,16 @@ import ru.shameoff.javalab1.entity.UserEntity;
 import ru.shameoff.javalab1.repositories.UserRepository;
 import ru.shameoff.javalab1.security.CustomUserDetails;
 
-import java.util.Collections;
-
+/**
+ * Этот сервис нужен Spring Security только для того, чтобы использовать в authenticationManager для проверки полей
+ */
 @Service
-public class CustomUserDetailService implements UserDetailsService {
+public class UserDetailServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
     @Autowired
-    public CustomUserDetailService(UserRepository userRepository){
+    public UserDetailServiceImpl(UserRepository userRepository){
         this.userRepository = userRepository;
     }
 

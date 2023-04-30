@@ -1,6 +1,7 @@
 package ru.shameoff.javalab1.security;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,22 +17,15 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import ru.shameoff.javalab1.security.props.SecurityProps;
-import ru.shameoff.javalab1.service.CustomUserDetailService;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     private final SecurityProps securityProps;
-    private CustomUserDetailService userDetailService;
-
-    @Autowired
-    public SecurityConfig(SecurityProps securityProps, CustomUserDetailService userDetailService) {
-        this.securityProps = securityProps;
-        this.userDetailService = userDetailService;
-    }
 
     /**
      * <p>Цепочка для фильтрации запросов с JWT </p>
@@ -94,7 +88,7 @@ public class SecurityConfig {
                 && Arrays.stream(ignorePath).noneMatch(item -> req.getServletPath().startsWith(item));
     }
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager getAuthenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
