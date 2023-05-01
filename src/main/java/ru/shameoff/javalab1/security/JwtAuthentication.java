@@ -8,9 +8,7 @@ public class JwtAuthentication extends AbstractAuthenticationToken {
         super(null);
         this.setDetails(jwtUserData);
         setAuthenticated(true);
-
     }
-
     @Override
     public Object getCredentials() {
         return null;

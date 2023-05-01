@@ -3,7 +3,6 @@ package ru.shameoff.javalab1.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,13 +37,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChainJwt(HttpSecurity http) throws Exception {
         http = http
-                .requestMatcher(filterRequestByPredicatePath(
+                .requestMatcher(createCustomReqMatcher(
                         securityProps.getJwtTokenProps().getRootPath(),
                         securityProps.getJwtTokenProps().getPermitAll()))
                 .addFilterBefore(
                         new JwtTokenFilter(securityProps.getJwtTokenProps().getSecret()),
                         UsernamePasswordAuthenticationFilter.class
                 )
+
                 .csrf().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -63,7 +63,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChainIntegration(HttpSecurity http) {
         http = http
-                .requestMatcher(filterRequestByPredicatePath(securityProps.getIntegrationsProps().getRootPath()))
+                .requestMatcher(createCustomReqMatcher(securityProps.getIntegrationsProps().getRootPath()))
                 .addFilterBefore(
                         new IntegrationFilter(securityProps.getIntegrationsProps().getApiKey()),
                         UsernamePasswordAuthenticationFilter.class
@@ -82,7 +82,7 @@ public class SecurityConfig {
      * @param ignorePath   паттерн(ы) для игнорируемых путей
      * @return {@link RequestMatcher}
      */
-    private RequestMatcher filterRequestByPredicatePath(String rootPath, String... ignorePath) {
+    private RequestMatcher createCustomReqMatcher(String rootPath, String... ignorePath) {
         return req -> Objects.nonNull(req.getServletPath())
                 && req.getServletPath().startsWith(rootPath)
                 && Arrays.stream(ignorePath).noneMatch(item -> req.getServletPath().startsWith(item));

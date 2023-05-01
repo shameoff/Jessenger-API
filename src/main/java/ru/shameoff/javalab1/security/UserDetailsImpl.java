@@ -6,11 +6,11 @@ import ru.shameoff.javalab1.entity.UserEntity;
 
 import java.util.Collection;
 
-public class CustomUserDetails implements UserDetails {
+public class UserDetailsImpl implements UserDetails {
 
     private final UserEntity user;
 
-    public CustomUserDetails(UserEntity user) {
+    public UserDetailsImpl(UserEntity user) {
         this.user = user;
     }
 
@@ -26,7 +26,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.user.getLogin();
+        return this.user.getUsername();
     }
 
     @Override

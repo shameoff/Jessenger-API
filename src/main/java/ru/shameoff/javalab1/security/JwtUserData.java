@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtUserData {
 
-    public final String id;
-    public final String login;
-    public final String name;
+    private final String id;
+    private final String username;
+    private final String fullName;
 }

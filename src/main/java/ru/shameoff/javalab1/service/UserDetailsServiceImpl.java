@@ -7,24 +7,24 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.shameoff.javalab1.entity.UserEntity;
 import ru.shameoff.javalab1.repositories.UserRepository;
-import ru.shameoff.javalab1.security.CustomUserDetails;
+import ru.shameoff.javalab1.security.UserDetailsImpl;
 
 /**
  * Этот сервис нужен Spring Security только для того, чтобы использовать в authenticationManager для проверки полей
  */
 @Service
-public class UserDetailServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
     @Autowired
-    public UserDetailServiceImpl(UserRepository userRepository){
+    public UserDetailsServiceImpl(UserRepository userRepository){
         this.userRepository = userRepository;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByLogin(username).orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
-        return new CustomUserDetails(userEntity);
+    public UserDetailsImpl loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
+        return new UserDetailsImpl(userEntity);
     }
 }

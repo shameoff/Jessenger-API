@@ -1,8 +1,10 @@
 package ru.shameoff.javalab1.dto;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import java.util.Date;
 
 @Data
@@ -16,7 +18,9 @@ public class RegisterDto {
     @NotNull
     private final String password;
     @NotNull
-    private final String firstMiddleLastName;
+    private final String fullName;
+    @Past
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private final Date birthDate;
     private final String phoneNumber;
     private final String city;

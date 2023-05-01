@@ -1,22 +1,20 @@
 package ru.shameoff.javalab1.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class UserDto {
+public class EditUserInfoDto {
 
-    private String id;
-    private String login;
-    private String email;
     private String fullName;
+    @Past
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birthDate;
     private String phoneNumber;
     private String city;

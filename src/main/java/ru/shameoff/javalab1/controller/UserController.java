@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.shameoff.javalab1.dto.EditUserInfoDto;
 import ru.shameoff.javalab1.dto.LoginDto;
 import ru.shameoff.javalab1.dto.RegisterDto;
 import ru.shameoff.javalab1.dto.UserDto;
@@ -13,7 +14,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -30,14 +31,14 @@ public class UserController {
     }
 
     /**
-     * @param userDto - JSON object which is parsed automatically
+     * @param editUserInfoDto - JSON object which is parsed automatically
      * @param bindingResult - an object to check parsing errors
      * @return new fields of user in DTO or ErrorMessage
      */
     @PutMapping("/profile")
-    public ResponseEntity<?> editProfile(@Valid @RequestBody UserDto userDto, BindingResult bindingResult){
+    public ResponseEntity<?> editProfile(@Valid @RequestBody EditUserInfoDto editUserInfoDto, BindingResult bindingResult){
         return bindingResult.hasErrors() ? ResponseEntity.badRequest().body(printErrors(bindingResult))
-                :userService.updateInfo(userDto);
+                :userService.updateInfo(editUserInfoDto);
     }
 
     @GetMapping("/profile")

@@ -8,7 +8,6 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Entity
 @Table(name = "users")
 public class UserEntity {
@@ -18,14 +17,14 @@ public class UserEntity {
     private String id;
     @NonNull
     @Column(nullable = false)
-    private String login;
+    private String username;
      private String email;
     @NonNull
     @Column(nullable = false)
     private String password;
     @NonNull
     @Column(nullable = false)
-    private String firstMiddleLastName;
+    private String fullName;
     @Temporal(TemporalType.DATE)
     @Column
     private Date birthDate;
