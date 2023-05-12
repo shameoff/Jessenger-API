@@ -16,8 +16,11 @@
 
     <modules>
         <module>common</module>
-        <module>user-app</module>
-        <module>friends-app</module>
+        <module>AppUser</module>
+        <module>AppFriends</module>
+        <module>AppGateway</module>
+        <module>AppChat</module>
+        <module>AppNotifications</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -33,10 +36,25 @@
         <jjwt.version>0.11.5</jjwt.version>
         <flyway.version>9.16.0</flyway.version>
         <postgresql.version>42.5.4</postgresql.version>
+        <spring-cloud.version>2021.0.6</spring-cloud.version>
+        <spring-gateway.version>3.1.6</spring-gateway.version>
+        <swagger.version>3.0.0</swagger.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-gateway</artifactId>
+                <version>${spring-gateway.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
@@ -85,6 +103,11 @@
                 <artifactId>spring-security-test</artifactId>
                 <version>${spring-security.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-boot-starter</artifactId>
+                <version>${swagger.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.postgresql</groupId>

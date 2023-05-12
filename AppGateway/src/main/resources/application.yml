@@ -1,0 +1,26 @@
+server:
+  port: 8010
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: users
+          uri: http://localhost:8011/
+          predicates:
+            - Path=/users/**
+
+        - id: friends
+          uri: http://localhost:8012/
+          predicates:
+            - Path=/friends/**
+
+        - id: chat
+          uri: http://localhost:8013/
+          predicates:
+            - Path=/chat/**
+
+        - id: notifications
+          uri: http://localhost:8014/
+          predicates:
+            - Path=/notif/**

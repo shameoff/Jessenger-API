@@ -1,0 +1,49 @@
+server:
+  port: 8011
+#  servlet:
+#    context-path: "/users"
+
+app:
+  security:
+    jwt-token-props:
+      permit-all:
+        - "/api/users/register"
+        - "/api/users/login"
+      root-path: "/api"
+      secret: "yiw1z2XJKQ7VHI/ck49j/RUAWm1gmhJ6x0MavXEV2bvHIDNfxXI2s3nCXfD58YYXZW9KYo/OkJmSunGhpJTA4nK53FxVcACt+kf6NhG6VA40gaUGOSnGupPtv8hhLGnKRD9BIjvbhFrMjIkyL4/WGyFObglcnmrxT12z5Cl4Zr6zKKFUfX6W2XXj7VZxGvrXS4vSNWWkBPP117V4+0yiq7/HgjJNAGAL7NrDVg=="
+      expiration: 864000000
+    integrations-props:
+      root-path: "/integration"
+      api-key: "ac546098c1c44ac2b2ae132f89c82e7e345d25a1h46474e75a78f9a5ce496060c"
+  test-message:
+    current-service: "UserService"
+spring:
+  devtools:
+    restart:
+      enabled: true
+  flyway:
+    locations: classpath:migrations
+    url: "jdbc:postgresql://localhost:6666/user_db"
+    user: "user_user"
+    password: "user_password"
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: "jdbc:postgresql://localhost:6666/user_db"
+    username: "user_user"
+    password: "user_password"
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+#    generate-ddl: true # Делаем так, чтобы Spring сам управлял сущностями БД
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+
+
+  mvc: # Чтобы работали HTTP методы PUT, PATCH, DELETE
+    hiddenmethod:
+      filter:
+        enabled: true

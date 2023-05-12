@@ -1,0 +1,215 @@
+openapi: 3.0.0
+info:
+  title: JessengerAPI
+  contact: { }
+  version: '1.0'
+servers:
+  - url: https://localhost:8010
+    variables: { }
+paths:
+  /api/users/register:
+    post:
+      tags:
+        - users
+      summary: Register
+      operationId: Register
+      parameters: [ ]
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RegisterRequest'
+                - example:
+                    username: user
+                    fullName: Perdole
+                    email: mail@mail.com
+                    birthDate: 2003-03-16
+                    password: password
+            example:
+              username: user
+              fullName: Perdole
+              email: mail@mail.com
+              birthDate: 2003-03-16
+              password: password
+        required: true
+      responses:
+        default:
+          description: ''
+          headers: { }
+          content: { }
+      deprecated: false
+
+  /api/users/login:
+    post:
+      tags:
+        - users
+      summary: Login
+      operationId: Login
+      parameters: [ ]
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/LoginRequest'
+                - example:
+                    username: root
+                    password: password
+            example:
+              username: root
+              password: password
+        required: true
+      responses:
+        default:
+          description: ''
+          headers: { }
+          content: { }
+      deprecated: false
+  /api/users/profile:
+    put:
+      tags:
+        - users
+      summary: Edit Profile
+      operationId: EditProfile
+      parameters: [ ]
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EditProfileRequest'
+                - example:
+                    id: ''
+                    login: user
+                    email: mail@mail.com
+                    password: password
+                    firstMiddleLastName: fml
+                    birthDate: 2003-03-16
+                    phoneNumber: '88005553535'
+                    city: Moscow
+                    avatarUuid: 0d4e8cdb-e3b3-40ac-be65-3fa21fe92bdb
+            example:
+              id: ''
+              login: user
+              email: mail@mail.com
+              password: password
+              firstMiddleLastName: fml
+              birthDate: 2003-03-16
+              phoneNumber: '88005553535'
+              city: Moscow
+              avatarUuid: 0d4e8cdb-e3b3-40ac-be65-3fa21fe92bdb
+        required: true
+      responses:
+        '200':
+          description: ''
+          headers: { }
+      deprecated: false
+  /api:
+    get:
+      tags:
+        - users
+      summary: Show Profile
+      operationId: ShowProfile
+      parameters: [ ]
+      responses:
+        '200':
+          description: ''
+          headers: { }
+      deprecated: false
+
+components:
+  schemas:
+    RegisterRequest:
+      title: RegisterRequest
+      required:
+        - username
+        - fullName
+        - email
+        - birthDate
+        - password
+      type: object
+      properties:
+        username:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        birthDate:
+          type: string
+        password:
+          type: string
+      example:
+        username: user
+        fullName: Perdole
+        email: mail@mail.com
+        birthDate: 2003-03-16
+        password: password
+    LoginRequest:
+      title: LoginRequest
+      required:
+        - username
+        - password
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      example:
+        username: root
+        password: password
+    EditProfileRequest:
+      title: EditProfileRequest
+      required:
+        - id
+        - login
+        - email
+        - password
+        - firstMiddleLastName
+        - birthDate
+        - phoneNumber
+        - city
+        - avatarUuid
+      type: object
+      properties:
+        id:
+          type: string
+        login:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        firstMiddleLastName:
+          type: string
+        birthDate:
+          type: string
+        phoneNumber:
+          type: string
+        city:
+          type: string
+        avatarUuid:
+          type: string
+      example:
+        id: ''
+        login: user
+        email: mail@mail.com
+        password: password
+        firstMiddleLastName: fml
+        birthDate: 2003-03-16
+        phoneNumber: '88005553535'
+        city: Moscow
+        avatarUuid: 0d4e8cdb-e3b3-40ac-be65-3fa21fe92bdb
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+security:
+  - bearer: [ ]
+tags:
+  - name: users
