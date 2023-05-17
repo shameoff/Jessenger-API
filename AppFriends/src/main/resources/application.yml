@@ -4,6 +4,14 @@ app:
   test-message:
     current-service: "FriendsService"
 
+eureka:
+  client:
+    enabled: true
+    service-url:
+        defaultZone: http://localhost:8020/eureka/
+  instance:
+    prefer-ip-address: true
+
 spring:
   application:
     name: friends-service
@@ -24,8 +32,8 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
-    #    generate-ddl: true # Делаем так, чтобы Spring сам управлял сущностями БД
+      ddl-auto: update
+      generate-ddl: true # Делаем так, чтобы Spring сам управлял сущностями БД
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
