@@ -6,8 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @ConfigurationPropertiesScan("ru.shameoff.jessenger.gateway")
 @SpringBootApplication
-public class GatewayApp {
 
+public class GatewayApp {
     public static void main(String[] args) {
         SpringApplication.run(GatewayApp.class, args);
     }

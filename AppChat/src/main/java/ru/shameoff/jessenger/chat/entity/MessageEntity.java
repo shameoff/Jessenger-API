@@ -7,6 +7,7 @@ import lombok.NonNull;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 
 @Data
@@ -19,10 +20,10 @@ public class MessageEntity {
         @Id
         @NonNull
         @Column(name = "id", columnDefinition = "VARCHAR(255)", nullable = false)
-        private String id;
+        private UUID id;
         @NonNull
         @Column(nullable = false)
-        private String chatLink;
+        private UUID chatId;
         @Temporal(TemporalType.DATE)
         @Column
         private Date sendingDate;

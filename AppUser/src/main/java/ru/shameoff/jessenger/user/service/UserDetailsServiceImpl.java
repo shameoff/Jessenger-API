@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.shameoff.jessenger.user.entity.UserEntity;
-import ru.shameoff.jessenger.user.repositories.UserRepository;
+import ru.shameoff.jessenger.user.repository.UserRepository;
 import ru.shameoff.jessenger.user.security.UserDetailsImpl;
 
 /**

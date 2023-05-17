@@ -7,6 +7,8 @@ import lombok.NonNull;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -17,20 +19,22 @@ public class ChatEntity {
         @Id
         @NonNull
         @Column(name = "id", columnDefinition = "VARCHAR(255)", nullable = false)
-        private String id;
+        private UUID id;
 
         @NonNull
         @Column(nullable = false)
-        private Boolean isDialog;
+        private Boolean isPrivate;
         @Column
-        private String adminId;
+        private UUID adminId;
 
-        @NonNull
-        @Temporal(TemporalType.DATE)
-        @Column(nullable = false)
-        private Date creationDate;
         @Column
-        private String avatarUuid;
+        private UUID avatarId;
+
+        @Column
+        private String name;
+
+        @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<ChatUserEntity> users;
 }
 
 /*

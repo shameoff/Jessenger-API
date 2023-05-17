@@ -1,7 +1,5 @@
 server:
   port: 8014
-  servlet:
-    context-path: "/notif"
 
 app:
   test-message:
@@ -37,3 +35,5 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+  application:
+    name: notifications-service

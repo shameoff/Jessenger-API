@@ -1,26 +1,32 @@
 server:
   port: 8010
-
 spring:
+  application:
+    name: gateway
   cloud:
     gateway:
       routes:
+        - id: swagger
+          uri: http://localhost:8010/api/swagger-ui.html
+          predicates:
+            - Path=/api/swagger
+
         - id: users
           uri: http://localhost:8011/
           predicates:
-            - Path=/users/**
+            - Path=/api/users/**
 
         - id: friends
           uri: http://localhost:8012/
           predicates:
-            - Path=/friends/**
+            - Path=/api/friends/**
 
         - id: chat
           uri: http://localhost:8013/
           predicates:
-            - Path=/chat/**
+            - Path=/api/chat/**
 
         - id: notifications
           uri: http://localhost:8014/
           predicates:
-            - Path=/notif/**
+            - Path=/api/notif/**

@@ -19,7 +19,7 @@ import ru.shameoff.jessenger.user.dto.LoginDto;
 import ru.shameoff.jessenger.user.dto.RegisterDto;
 import ru.shameoff.jessenger.user.dto.UserDto;
 import ru.shameoff.jessenger.user.entity.UserEntity;
-import ru.shameoff.jessenger.user.repositories.UserRepository;
+import ru.shameoff.jessenger.user.repository.UserRepository;
 import ru.shameoff.jessenger.user.security.JwtUserData;
 import ru.shameoff.jessenger.user.security.UserDetailsImpl;
 import ru.shameoff.jessenger.user.security.props.SecurityProps;

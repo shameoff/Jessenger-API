@@ -1,35 +1,34 @@
 server:
-  port: 8013
-app:
-  test-message:
-    current-service: "ChatService"
+  port: 8020
 
 eureka:
   client:
-    enabled: true
-    fetchRegistry: true
-    serviceUrl:
-      defaultZone: http://localhost:8020/eureka/
+    registerWithEureka: false
+    fetchRegistry: false
   instance:
-    prefer-ip-address: true
+    hostname: localhost
+
+app:
+  test-message:
+    current-service: eureka
 
 spring:
   application:
-    name: chat-service
+    name: eureka
   devtools:
     restart:
       enabled: true
   flyway:
     locations: classpath:migrations
-    url: "jdbc:postgresql://localhost:6666/chat_db"
-    user: "chat_user"
-    password: "chat_password"
+    url: "jdbc:postgresql://localhost:6666/eureka_db"
+    user: "eureka_user"
+    password: "eureka_password"
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://localhost:6666/chat_db"
-    username: "chat_user"
-    password: "chat_password"
+    url: "jdbc:postgresql://localhost:6666/eureka_db"
+    username: "eureka_user"
+    password: "eureka_password"
 
   jpa:
     hibernate:

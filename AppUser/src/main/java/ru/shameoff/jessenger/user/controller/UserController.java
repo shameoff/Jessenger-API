@@ -13,8 +13,8 @@ import ru.shameoff.jessenger.user.service.UserService;
 import javax.validation.Valid;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;

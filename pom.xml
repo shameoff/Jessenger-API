@@ -21,6 +21,8 @@
         <module>AppGateway</module>
         <module>AppChat</module>
         <module>AppNotifications</module>
+        <module>swagger-aggregator</module>
+        <module>Eureka</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -38,7 +40,9 @@
         <postgresql.version>42.5.4</postgresql.version>
         <spring-cloud.version>2021.0.6</spring-cloud.version>
         <spring-gateway.version>3.1.6</spring-gateway.version>
-        <swagger.version>3.0.0</swagger.version>
+        <springdoc.version>1.7.0</springdoc.version>
+        <eureka.version>3.1.5</eureka.version>
+        <openfeign.version>4.0.1</openfeign.version>
     </properties>
 
     <dependencyManagement>
@@ -105,9 +109,19 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-boot-starter</artifactId>
-                <version>${swagger.version}</version>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+                <version>${eureka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-openfeign</artifactId>
+                <version>${openfeign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.postgresql</groupId>

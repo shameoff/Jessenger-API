@@ -1,13 +1,12 @@
 server:
   port: 8012
-  servlet:
-    context-path: "/friends"
-
 app:
   test-message:
     current-service: "FriendsService"
 
 spring:
+  application:
+    name: friends-service
   devtools:
     restart:
       enabled: true
