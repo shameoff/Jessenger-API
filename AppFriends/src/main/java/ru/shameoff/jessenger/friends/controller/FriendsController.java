@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.shameoff.jessenger.friends.dto.AddFriendDto;
+import ru.shameoff.jessenger.friends.dto.RetrieveFriendsDto;
 import ru.shameoff.jessenger.friends.service.FriendsService;
 
 import javax.validation.Valid;
@@ -41,14 +42,14 @@ public class FriendsController {
 
     private final FriendsService friendsService;
     @PostMapping()
-    public ResponseEntity retrieveFriends() {
-        friendsService.retrieveFriends();
+    public ResponseEntity retrieveFriends(@RequestBody RetrieveFriendsDto dto) {
+        friendsService.retrieveFriends(dto);
         return null;
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity retrieveFriendsProfile(@PathVariable String userId) {
-        friendsService.retrieveFriendsProfile();
+    public ResponseEntity retrieveFriendProfile(@PathVariable String userId) {
+        friendsService.retrieveFriendProfile();
         return null;
     }
 

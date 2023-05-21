@@ -1,4 +1,4 @@
-package ru.shameoff.jessenger.user.security;
+package ru.shameoff.jessenger.common.security;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

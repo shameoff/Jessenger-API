@@ -20,17 +20,16 @@ import ru.shameoff.jessenger.user.dto.RegisterDto;
 import ru.shameoff.jessenger.user.dto.UserDto;
 import ru.shameoff.jessenger.user.entity.UserEntity;
 import ru.shameoff.jessenger.user.repository.UserRepository;
-import ru.shameoff.jessenger.user.security.JwtUserData;
-import ru.shameoff.jessenger.user.security.UserDetailsImpl;
-import ru.shameoff.jessenger.user.security.props.SecurityProps;
+import ru.shameoff.jessenger.common.security.JwtUserData;
+import ru.shameoff.jessenger.common.security.props.SecurityProps;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
-import static ru.shameoff.jessenger.user.security.SecurityConstants.HEADER_AUTH;
-import static ru.shameoff.jessenger.user.security.SecurityConstants.TOKEN_PREFIX;
+import static ru.shameoff.jessenger.common.security.SecurityConstants.HEADER_AUTH;
+import static ru.shameoff.jessenger.common.security.SecurityConstants.TOKEN_PREFIX;
 
 @Service
 @RequiredArgsConstructor
@@ -42,31 +41,34 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    private String generateToken(UserEntity user){
+    private String generateToken(UserEntity user) {
         var signKey = Keys.hmacShaKeyFor(securityProps.getJwtTokenProps().getSecret().getBytes(StandardCharsets.UTF_8));
         var expiration = new Date(System.currentTimeMillis() + securityProps.getJwtTokenProps().getExpiration());
 
         return Jwts.builder()
-                .setSubject(user.getId())
+                .setSubject(user.getId().toString())
                 .claim("username", user.getUsername())
                 .claim("fullName", user.getFullName())
                 .setExpiration(expiration)
                 .signWith(signKey)
                 .compact();
     }
+
     @Transactional
     public ResponseEntity<?> login(LoginDto loginDto) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+            Authentication authentication =
+                    new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
+            System.out.println("ТОКЕН НЕ ПРИ ЧЁМ\n" + authentication + " " + authentication.getName() + " " + authentication.getPrincipal() + " " + authentication.getCredentials() + " " + authentication.getAuthorities() + " " + authentication.getDetails() + " " + "\n");
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            // Я положил объект пользователя в principal, чтобы можно было не обращаясь к БД второй раз достать его
-            var user = ((UserDetailsImpl) authentication.getPrincipal()).getUser();
+            authentication = authenticationManager.authenticate(authentication);
+            var user = userRepository.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
+            var token = generateToken(user);
             return ResponseEntity.ok()
-                    .header(HEADER_AUTH, TOKEN_PREFIX + generateToken(user))
+                    .header(HEADER_AUTH, TOKEN_PREFIX + token)
                     .body(modelMapper.map(user, UserDto.class));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Incorrect credentials!");
         }
@@ -74,45 +76,36 @@ public class UserService {
 
     @Transactional
     public UserDto retrieveInfo() {
+        System.out.println("retrieveInfo\n");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserData jwt = (JwtUserData) authentication.getPrincipal();
-        System.out.println(jwt.getUsername() + " " + jwt.getFullName() + " " + jwt.getId());
-        UserEntity userEntity = userRepository.findByUsername(((JwtUserData) authentication.getPrincipal()).getUsername())
+        JwtUserData jwtUserData = (JwtUserData) authentication.getPrincipal();
+        System.out.println(jwtUserData.getUsername() + " " + jwtUserData.getFullName() + " " + jwtUserData.getId());
+        UserEntity userEntity = userRepository.findByUsername(jwtUserData.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
         return modelMapper.map(userEntity, UserDto.class);
     }
 
     public ResponseEntity<?> updateInfo(EditUserInfoDto editUserInfoDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserEntity userEntity = userRepository.findByUsername(((JwtUserData) authentication.getPrincipal()).getUsername())
+        JwtUserData jwtUserData = (JwtUserData) authentication.getPrincipal();
+        UserEntity userEntity = userRepository.findByUsername(jwtUserData.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
-        Optional.ofNullable(editUserInfoDto.getFullName()).ifPresent(userEntity::setFullName);
-        Optional.ofNullable(editUserInfoDto.getBirthDate()).ifPresent(userEntity::setBirthDate);
-        Optional.ofNullable(editUserInfoDto.getPhoneNumber()).ifPresent(userEntity::setPhoneNumber);
-        Optional.ofNullable(editUserInfoDto.getCity()).ifPresent(userEntity::setCity);
-        Optional.ofNullable(editUserInfoDto.getAvatarUuid()).ifPresent(userEntity::setAvatarUuid);
+        modelMapper.map(editUserInfoDto, userEntity);
         var savedUser = userRepository.save(userEntity);
         return ResponseEntity.ok().body(modelMapper.map(savedUser, UserDto.class));
     }
+
     @Transactional
     public ResponseEntity<?> register(RegisterDto registerDto) {
         if (userRepository.existsUserByUsername(registerDto.getUsername())) {
             return ResponseEntity.badRequest().body("User with this login already exists!");
         }
-        if (userRepository.existsUserByEmail(registerDto.getEmail())){
+        if (userRepository.existsUserByEmail(registerDto.getEmail())) {
             return ResponseEntity.badRequest().body("User with this email already exists!");
         }
-        var user = new UserEntity(
-                UUID.randomUUID().toString(),
-                registerDto.getUsername(),
-                registerDto.getEmail(),
-                passwordEncoder.encode(registerDto.getPassword()),
-                registerDto.getFullName(),
-                registerDto.getBirthDate(),
-                registerDto.getPhoneNumber(),
-                registerDto.getCity(),
-                registerDto.getAvatarUuid()
-        );
+        var user = modelMapper.map(registerDto, UserEntity.class);
+        user.setId(UUID.randomUUID());
+        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         var registeredUser = userRepository.save(user);
         var token = generateToken(registeredUser);
         return ResponseEntity.ok()

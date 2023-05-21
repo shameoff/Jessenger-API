@@ -1,4 +1,4 @@
-package ru.shameoff.jessenger.user.security.props;
+package ru.shameoff.jessenger.common.security.props;
 
 import lombok.Getter;
 import lombok.Setter;

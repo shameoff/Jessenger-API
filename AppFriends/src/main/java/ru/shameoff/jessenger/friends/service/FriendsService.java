@@ -3,8 +3,8 @@ package ru.shameoff.jessenger.friends.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 import ru.shameoff.jessenger.friends.dto.AddFriendDto;
+import ru.shameoff.jessenger.friends.dto.RetrieveFriendsDto;
 import ru.shameoff.jessenger.friends.repository.FriendsRepository;
 
 @Service
@@ -12,10 +12,11 @@ import ru.shameoff.jessenger.friends.repository.FriendsRepository;
 public class FriendsService {
     private final FriendsRepository friendsRepository;
 
-    public void retrieveFriends() {
+    public void retrieveFriends(RetrieveFriendsDto dto) {
+
     }
 
-    public void retrieveFriendsProfile() {
+    public void retrieveFriendProfile() {
     }
 
     public ResponseEntity addFriend(AddFriendDto addFriendDto) {

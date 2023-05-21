@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Past;
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -17,5 +18,5 @@ public class EditUserInfoDto {
     private Date birthDate;
     private String phoneNumber;
     private String city;
-    private String avatarUuid;
+    private UUID avatarUuid;
 }

@@ -1,4 +1,4 @@
-package ru.shameoff.jessenger.user.security;
+package ru.shameoff.jessenger.common.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
 
-import static ru.shameoff.jessenger.user.security.SecurityConstants.HEADER_INTEGRATION;
+import static ru.shameoff.jessenger.common.security.SecurityConstants.HEADER_INTEGRATION;
 
 @RequiredArgsConstructor
 public class IntegrationFilter extends OncePerRequestFilter {

@@ -7,6 +7,8 @@ import ru.shameoff.jessenger.friends.dto.AddFriendDto;
 import ru.shameoff.jessenger.friends.repository.BlacklistRepository;
 import ru.shameoff.jessenger.friends.repository.FriendsRepository;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class BlacklistService {
@@ -15,19 +17,19 @@ public class BlacklistService {
     public void retrieveBlockedUsers() {
     }
 
-    public ResponseEntity blockUser(AddFriendDto addFriendDto) {
+    public ResponseEntity blockUser(UUID userId) {
         return null;
     }
 
-    public ResponseEntity unblockUser(String userId) {
+    public ResponseEntity unblockUser(UUID userId) {
         return null;
     }
 
-    public ResponseEntity updateBlockedUser(String userId) {
+    public ResponseEntity updateBlockedUser(UUID userId) {
         return null;
     }
 
-    public ResponseEntity searchBlockedUser(String userId) {
+    public ResponseEntity searchBlockedUser(UUID userId) {
         return null;
     }
 }

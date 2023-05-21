@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -14,7 +15,7 @@ public class UserEntity {
     @Id
     @NonNull
     @Column(name = "id", columnDefinition = "VARCHAR(255)", nullable = false)
-    private String id;
+    private UUID id;
     @NonNull
     @Column(nullable = false)
     private String username;
@@ -33,6 +34,6 @@ public class UserEntity {
     @Column
     private String city;
     @Column
-    private String avatarUuid;
+    private UUID avatarUuid;
 
 }

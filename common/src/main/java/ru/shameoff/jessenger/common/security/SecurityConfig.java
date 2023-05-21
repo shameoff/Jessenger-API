@@ -1,21 +1,29 @@
-package ru.shameoff.jessenger.user.security;
+package ru.shameoff.jessenger.common.security;
 
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import ru.shameoff.jessenger.user.security.props.SecurityProps;
+import ru.shameoff.jessenger.common.security.props.SecurityProps;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -23,9 +31,10 @@ import java.util.Objects;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@ConfigurationPropertiesScan("ru.shameoff.jessenger.common")
+@EnableConfigurationProperties(SecurityProps.class)
 public class SecurityConfig {
     private final SecurityProps securityProps;
-
     /**
      * <p>Цепочка для фильтрации запросов с JWT </p>
      * <p></p>
@@ -36,6 +45,7 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChainJwt(HttpSecurity http) throws Exception {
+        System.out.println(securityProps);
         http = http
                 .requestMatcher(createCustomReqMatcher(
                         securityProps.getJwtTokenProps().getRootPath(),
@@ -88,7 +98,7 @@ public class SecurityConfig {
                 && Arrays.stream(ignorePath).noneMatch(item -> req.getServletPath().startsWith(item));
     }
     @Bean
-    public AuthenticationManager getAuthenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 

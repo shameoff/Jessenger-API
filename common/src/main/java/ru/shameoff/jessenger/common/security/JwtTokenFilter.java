@@ -1,4 +1,4 @@
-package ru.shameoff.jessenger.user.security;
+package ru.shameoff.jessenger.common.security;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import static ru.shameoff.jessenger.user.security.SecurityConstants.HEADER_AUTH;
-import static ru.shameoff.jessenger.user.security.SecurityConstants.TOKEN_PREFIX;
+import static ru.shameoff.jessenger.common.security.SecurityConstants.HEADER_AUTH;
+import static ru.shameoff.jessenger.common.security.SecurityConstants.TOKEN_PREFIX;
 
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
