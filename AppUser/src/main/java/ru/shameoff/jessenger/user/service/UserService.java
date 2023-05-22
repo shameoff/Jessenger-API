@@ -23,6 +23,7 @@ import ru.shameoff.jessenger.user.repository.UserRepository;
 import ru.shameoff.jessenger.common.security.JwtUserData;
 import ru.shameoff.jessenger.common.security.props.SecurityProps;
 
+import javax.validation.constraints.Null;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Optional;
@@ -75,11 +76,15 @@ public class UserService {
     }
 
     @Transactional
+    public UserDto retrieveInfo(UUID userId) {
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
+        return modelMapper.map(userEntity, UserDto.class);
+    }
+
+    @Transactional
     public UserDto retrieveInfo() {
-        System.out.println("retrieveInfo\n");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserData jwtUserData = (JwtUserData) authentication.getPrincipal();
-        System.out.println(jwtUserData.getUsername() + " " + jwtUserData.getFullName() + " " + jwtUserData.getId());
+        var jwtUserData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity userEntity = userRepository.findByUsername(jwtUserData.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
         return modelMapper.map(userEntity, UserDto.class);

@@ -26,7 +26,7 @@ public class BlacklistController {
     private final BlacklistService blacklistService;
     @GetMapping("/{userId}/check")
     public void isInBlacklist(@PathVariable UUID userId) {
-
+        blacklistService.isInBlacklist(userId);
     }
 
     @GetMapping("/{userId}/add")

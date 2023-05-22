@@ -4,6 +4,7 @@ app:
       permit-all:
         - "/api/users/register"
         - "/api/users/login"
+        - "/error"
       root-path: "/api"
       secret: "yiw1z2XJKQ7VHI/ck49j/RUAWm1gmhJ6x0MavXEV2bvHIDNfxXI2s3nCXfD58YYXZW9KYo/OkJmSunGhpJTA4nK53FxVcACt+kf6NhG6VA40gaUGOSnGupPtv8hhLGnKRD9BIjvbhFrMjIkyL4/WGyFObglcnmrxT12z5Cl4Zr6zKKFUfX6W2XXj7VZxGvrXS4vSNWWkBPP117V4+0yiq7/HgjJNAGAL7NrDVg=="
       expiration: 864000000

@@ -1,5 +1,7 @@
 package ru.shameoff.jessenger.user.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -11,9 +13,10 @@ import ru.shameoff.jessenger.user.dto.UserDto;
 import ru.shameoff.jessenger.user.service.UserService;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -41,9 +44,15 @@ public class UserController {
                 :userService.updateInfo(editUserInfoDto);
     }
 
+    @GetMapping("/{userId}")
+    public UserDto showProfile(@PathVariable UUID userId){
+        return userService.retrieveInfo(userId);
+    }
+
+    @Operation(summary = "My endpoint", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/profile")
     public UserDto showProfile(){
-        return userService.retrieveInfo();
+         return userService.retrieveInfo();
     }
 
     /**

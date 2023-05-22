@@ -3,6 +3,7 @@ package ru.shameoff.jessenger.common.security;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -23,7 +24,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final String secretKey;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        System.out.println("ФИЛЬТРУЕМ ЗАПРОСИК");
         var jwt = request.getHeader(HEADER_AUTH);
         if (jwt == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header is empty");
@@ -32,6 +34,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // Token parsing
         try {
+            System.out.println("ПЫТАЮСЬ СПАРСИТЬ ТОКЕН");
             var key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
             var data = Jwts.parserBuilder()
                     .setSigningKey(key)
@@ -45,10 +48,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             var authentication = new JwtAuthentication(userData);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (JwtException e) {
+            System.out.println("ЖВТ НЕ ПРОКАТИЛ");
             // if token isn't valid or expired
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT is incorrect or expired");
             return;
         } catch (Exception e) {
+            System.out.println("Ваще хз что, но починим");
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Я хз что, но щас починим");
         }
 

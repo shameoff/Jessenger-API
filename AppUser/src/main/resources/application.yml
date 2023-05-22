@@ -3,18 +3,11 @@ spring.config.import: classpath:/security-config.yml
 # Всё это нужно чтобы можно было перезаписывать конфигурацию, подтянутую из security-config.yml
 # Подробнее https://stackoverflow.com/questions/65216091/override-property-with-my-profile-dev-in-spring-boot-2-4
 ---
+spring.config.import: classpath:/eureka-config.yml
+---
 
 server:
   port: 8011
-
-
-eureka:
-  client:
-    enabled: true
-    service-url:
-      defaultZone: http://localhost:8020/eureka/
-  instance:
-    prefer-ip-address: true
 
 app:
 
@@ -24,7 +17,7 @@ app:
 spring:
 
   application:
-    name: UserService
+    name: user-service
 
   devtools:
     restart:
