@@ -1,5 +1,6 @@
 package ru.shameoff.jessenger.friends.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +9,7 @@ import ru.shameoff.jessenger.friends.dto.RetrieveFriendsDto;
 import ru.shameoff.jessenger.friends.service.FriendsService;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 /*
 PATCH метод: Синхронизация данных
@@ -36,43 +38,43 @@ POST метод "Поиск"
 Ответ должен быть с пагинацией, по аналогии с методом "Список друзей"
  */
 @RestController
-@RequestMapping("/friends")
+@RequestMapping("/api/friends")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class FriendsController {
 
     private final FriendsService friendsService;
     @PostMapping()
     public ResponseEntity retrieveFriends(@RequestBody RetrieveFriendsDto dto) {
-        friendsService.retrieveFriends(dto);
-        return null;
+        return friendsService.retrieveFriends(dto);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity retrieveFriendProfile(@PathVariable String userId) {
-        friendsService.retrieveFriendProfile();
+    public ResponseEntity retrieveFriendProfile(@PathVariable UUID userId) {
+        friendsService.retrieveFriendProfile(userId);
         return null;
     }
 
     @PostMapping("/add")
     public ResponseEntity addFriend(@Valid @RequestBody AddFriendDto addFriendDto) {
-
-
         return friendsService.addFriend(addFriendDto);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity deleteFriend(@PathVariable String userId) {
+    public ResponseEntity deleteFriend(@PathVariable UUID userId) {
         return friendsService.deleteFriend(userId);
     }
 
-    @PatchMapping("/{userId}")
-    public ResponseEntity updateFriend(@PathVariable String userId) {
-        return friendsService.updateFriend(userId);
-    }
-
     @PostMapping("/search")
-    public ResponseEntity searchFriends(@RequestBody String userId) {
+    public ResponseEntity searchFriends(@RequestBody UUID userId) {
         return friendsService.searchFriends(userId);
     }
+
+
+//    @PatchMapping("/{userId}")
+//    public ResponseEntity updateFriend(@PathVariable UUID userId) {
+//        return friendsService.updateFriend(userId);
+
+//    }
 
 }

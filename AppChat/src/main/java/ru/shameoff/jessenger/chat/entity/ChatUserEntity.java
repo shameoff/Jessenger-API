@@ -3,6 +3,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import ru.shameoff.jessenger.common.BaseEntity;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -11,11 +12,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "chat_user")
 @NoArgsConstructor
-public class ChatUserEntity {
+public class ChatUserEntity extends BaseEntity {
 
-    @Id
-    @NonNull
-    private UUID id;
     @ManyToOne
     @JoinColumn(name = "chat_id", nullable = false)
     private ChatEntity chat;

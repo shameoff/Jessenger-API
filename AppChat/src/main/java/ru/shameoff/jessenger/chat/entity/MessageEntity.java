@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import ru.shameoff.jessenger.common.BaseEntity;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,18 +16,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "messages")
-public class MessageEntity {
+public class MessageEntity extends BaseEntity {
 
-        @Id
-        @NonNull
-        @Column(name = "id", columnDefinition = "VARCHAR(255)", nullable = false)
-        private UUID id;
         @NonNull
         @Column(nullable = false)
         private UUID chatId;
-        @Temporal(TemporalType.DATE)
-        @Column
-        private Date sendingDate;
         @NonNull
         @Column(nullable = false)
         private String messageText;

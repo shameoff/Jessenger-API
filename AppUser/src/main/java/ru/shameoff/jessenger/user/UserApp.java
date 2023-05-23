@@ -20,7 +20,7 @@ import ru.shameoff.jessenger.common.test.EnableTestMessage;
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 @EnableEurekaClient
 @EnableFeignClients
-@Import({CommonBeans.class, OpenAPI30Config.class, SecurityConfig.class})
+@Import({CommonBeans.class, SecurityConfig.class})
 public class UserApp {
 
     public static void main(String[] args) {

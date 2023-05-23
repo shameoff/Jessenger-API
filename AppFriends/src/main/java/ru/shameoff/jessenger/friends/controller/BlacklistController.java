@@ -1,11 +1,10 @@
 package ru.shameoff.jessenger.friends.controller;
 
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.shameoff.jessenger.friends.service.BlacklistService;
 
 import java.util.UUID;
@@ -19,14 +18,20 @@ GET метод "Проверка нахождения в черном списк
 от нахождения в черном списке
  */
 @RestController
-@RequestMapping("/blacklist")
+@RequestMapping("/api/blacklist")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class BlacklistController {
 
     private final BlacklistService blacklistService;
+
+    @GetMapping("")
+    public ResponseEntity<?> getBlacklist() {
+        return blacklistService.retrieveTargetUserBlacklist();
+    }
     @GetMapping("/{userId}/check")
-    public void isInBlacklist(@PathVariable UUID userId) {
-        blacklistService.isInBlacklist(userId);
+    public ResponseEntity<?> isInBlacklist(@PathVariable UUID userId) {
+        return blacklistService.isInBlacklist(userId);
     }
 
     @GetMapping("/{userId}/add")
@@ -38,6 +43,5 @@ public class BlacklistController {
     public void deleteFromBlacklist(@PathVariable UUID userId) {
         blacklistService.unblockUser(userId);
     }
-
 
 }

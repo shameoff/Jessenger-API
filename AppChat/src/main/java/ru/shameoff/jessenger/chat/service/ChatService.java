@@ -37,15 +37,12 @@ public class ChatService {
                 return ResponseEntity.badRequest().body("Пользователь не состоит в чате");
             }
             MessageEntity message = modelMapper.map(messageDto, MessageEntity.class);
-            message.setId(UUID.randomUUID());
             messageRepository.save(message);
             return ResponseEntity.ok().build();
         } else if (messageDto.getReceiverId() != null) {
 
         }
         MessageEntity message = modelMapper.map(messageDto, MessageEntity.class);
-        message.setId(UUID.randomUUID());
-
         messageRepository.save(message);
 
         return ResponseEntity.ok().build();
@@ -53,7 +50,6 @@ public class ChatService {
 
     public ResponseEntity createChat(ChatCreationDto chatDto) {
         ChatEntity chat = modelMapper.map(chatDto, ChatEntity.class);
-        chat.setId(UUID.randomUUID());
         chatRepository.save(chat);
         for (UUID userId : chatDto.getUsers()) {
             ChatUserEntity chatUser = new ChatUserEntity();

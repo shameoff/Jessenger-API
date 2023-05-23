@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 import static ru.shameoff.jessenger.common.security.SecurityConstants.HEADER_AUTH;
 import static ru.shameoff.jessenger.common.security.SecurityConstants.TOKEN_PREFIX;
@@ -41,7 +42,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     .build()
                     .parseClaimsJws(jwt.replace(TOKEN_PREFIX, ""));
             JwtUserData userData = new JwtUserData(
-                    data.getBody().getSubject(),
+                    UUID.fromString(data.getBody().getSubject()),
                     (String) data.getBody().get("username"),
                     (String) data.getBody().get("fullName")
             );

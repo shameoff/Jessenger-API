@@ -1,4 +1,4 @@
-package ru.shameoff.jessenger.user.dto;
+package ru.shameoff.jessenger.common.sharedDto;
 
 import lombok.*;
 

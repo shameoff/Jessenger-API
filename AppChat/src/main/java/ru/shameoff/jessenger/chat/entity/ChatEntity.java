@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import ru.shameoff.jessenger.common.BaseEntity;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,12 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "chats")
-public class ChatEntity {
-        @Id
-        @NonNull
-        @Column(name = "id", columnDefinition = "VARCHAR(255)", nullable = false)
-        private UUID id;
-
+public class ChatEntity extends BaseEntity {
         @NonNull
         @Column(nullable = false)
         private Boolean isPrivate;

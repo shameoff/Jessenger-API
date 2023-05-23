@@ -9,4 +9,7 @@ public class CommonBeans {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
+
+    @Bean
+    public OpenAPI30Config openApiConfig() {return new OpenAPI30Config();}
 }

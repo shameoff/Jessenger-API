@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import ru.shameoff.jessenger.common.BaseEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,12 +26,8 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Entity
 @Table(name = "attachments")
-public class AttachmentEntity {
+public class AttachmentEntity extends BaseEntity {
 
-    @Id
-    @NonNull
-    @Column(name = "id", columnDefinition = "VARCHAR(255)", nullable = false)
-    private String id;
     @NonNull
     @Column(nullable = false)
     private String messageLink;

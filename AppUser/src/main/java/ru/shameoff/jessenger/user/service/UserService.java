@@ -17,16 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.shameoff.jessenger.user.dto.EditUserInfoDto;
 import ru.shameoff.jessenger.user.dto.LoginDto;
 import ru.shameoff.jessenger.user.dto.RegisterDto;
-import ru.shameoff.jessenger.user.dto.UserDto;
+import ru.shameoff.jessenger.common.sharedDto.UserDto;
 import ru.shameoff.jessenger.user.entity.UserEntity;
 import ru.shameoff.jessenger.user.repository.UserRepository;
 import ru.shameoff.jessenger.common.security.JwtUserData;
 import ru.shameoff.jessenger.common.security.props.SecurityProps;
 
-import javax.validation.constraints.Null;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 
 import static ru.shameoff.jessenger.common.security.SecurityConstants.HEADER_AUTH;
@@ -42,6 +40,10 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+
+    public Boolean ifUserExistsById(UUID userId) {
+        return userRepository.existsById(userId);
+    }
     private String generateToken(UserEntity user) {
         var signKey = Keys.hmacShaKeyFor(securityProps.getJwtTokenProps().getSecret().getBytes(StandardCharsets.UTF_8));
         var expiration = new Date(System.currentTimeMillis() + securityProps.getJwtTokenProps().getExpiration());
@@ -77,6 +79,7 @@ public class UserService {
 
     @Transactional
     public UserDto retrieveInfo(UUID userId) {
+        System.out.println("ДОШЛИ ДО СЕРВИСА ИНТЕГРАЦИИИИИИ!!!!");
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
         return modelMapper.map(userEntity, UserDto.class);
@@ -109,7 +112,6 @@ public class UserService {
             return ResponseEntity.badRequest().body("User with this email already exists!");
         }
         var user = modelMapper.map(registerDto, UserEntity.class);
-        user.setId(UUID.randomUUID());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         var registeredUser = userRepository.save(user);
         var token = generateToken(registeredUser);

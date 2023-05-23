@@ -8,15 +8,18 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import ru.shameoff.jessenger.common.CommonBeans;
+import ru.shameoff.jessenger.common.client.UserServiceClient;
 import ru.shameoff.jessenger.common.security.SecurityConfig;
 import ru.shameoff.jessenger.common.test.EnableTestMessage;
 
 @EnableTestMessage
+@EnableJpaAuditing
 @ConfigurationPropertiesScan("ru.shameoff.jessenger.friends")
 @SpringBootApplication
 @EnableEurekaClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = {"ru.shameoff.jessenger"})
 @Import({SecurityConfig.class, CommonBeans.class})
 public class FriendsApp {
 

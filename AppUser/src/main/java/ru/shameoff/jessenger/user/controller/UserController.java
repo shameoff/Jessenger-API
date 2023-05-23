@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.shameoff.jessenger.user.dto.EditUserInfoDto;
 import ru.shameoff.jessenger.user.dto.LoginDto;
 import ru.shameoff.jessenger.user.dto.RegisterDto;
-import ru.shameoff.jessenger.user.dto.UserDto;
+import ru.shameoff.jessenger.common.sharedDto.UserDto;
 import ru.shameoff.jessenger.user.service.UserService;
 
 import javax.validation.Valid;

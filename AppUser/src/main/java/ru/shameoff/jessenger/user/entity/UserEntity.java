@@ -1,6 +1,7 @@
 package ru.shameoff.jessenger.user.entity;
 
 import lombok.*;
+import ru.shameoff.jessenger.common.BaseEntity;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -11,11 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class UserEntity {
-    @Id
-    @NonNull
-    @Column(name = "id", columnDefinition = "VARCHAR(255)", nullable = false)
-    private UUID id;
+public class UserEntity extends BaseEntity {
     @NonNull
     @Column(nullable = false)
     private String username;
