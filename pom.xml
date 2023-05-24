@@ -23,6 +23,7 @@
         <module>AppNotifications</module>
         <module>swagger-aggregator</module>
         <module>Eureka</module>
+        <module>AppFileserver</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -43,6 +44,7 @@
         <springdoc.version>1.7.0</springdoc.version>
         <eureka.version>3.1.5</eureka.version>
         <openfeign.version>4.0.1</openfeign.version>
+        <minio.version>8.5.2</minio.version>
     </properties>
 
     <dependencyManagement>
@@ -160,6 +162,11 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-core</artifactId>
                 <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -37,7 +37,6 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChainJwt(HttpSecurity http) throws Exception {
-        System.out.println("ЭТОТ БИН СОЗДАЛСЯ!" + securityProps);
         http = http
                 .requestMatcher(createCustomReqMatcher(
                         securityProps.getJwtTokenProps().getRootPath(),

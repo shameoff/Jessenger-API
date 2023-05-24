@@ -38,3 +38,7 @@ build/
 
 ### env data ###
 .env
+
+### minioclient ###
+/minio_config
+/minio_data
