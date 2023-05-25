@@ -4,17 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.shameoff.jessenger.chat.dto.ChatChangeDto;
 import ru.shameoff.jessenger.chat.dto.ChatCreationDto;
-import ru.shameoff.jessenger.chat.dto.NewMessageDto;
 import ru.shameoff.jessenger.chat.dto.MessageInListDto;
+import ru.shameoff.jessenger.chat.dto.NewMessageDto;
 import ru.shameoff.jessenger.chat.entity.ChatEntity;
 import ru.shameoff.jessenger.chat.entity.ChatUserEntity;
 import ru.shameoff.jessenger.chat.entity.MessageEntity;
 import ru.shameoff.jessenger.chat.repository.ChatRepository;
 import ru.shameoff.jessenger.chat.repository.ChatUserRepository;
 import ru.shameoff.jessenger.chat.repository.MessageRepository;
+import ru.shameoff.jessenger.common.security.JwtUserData;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,9 +34,9 @@ public class ChatService {
 
     // TODO отправление сообщений через streamBridge
     public ResponseEntity sendMessage(NewMessageDto messageDto) {
-        // ЭТО ПРОСТО ЗАГЛУШКА ДЛЯ ПРОВЕРКИ. ТУТ НАДО УЗНАВАТЬ, КТО ОТПРАВЛЯЕТ СООБЩЕНИЕ ИЗ AUTH КОНТЕКСТА
-        NewMessageDto me = new NewMessageDto(UUID.randomUUID(), UUID.randomUUID(), "text", null);
-        if (messageDto.getChatId() != null){
+        var jwt = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var targetUserId = jwt.getId();
+        if (messageDto.getChatId() != null) {
             ChatEntity chat = chatRepository.findById(messageDto.getChatId()).orElseThrow(RuntimeException::new);
             if (chat.getUsers().stream().noneMatch(u -> u.getId().equals(me))) {
                 return ResponseEntity.badRequest().body("Пользователь не состоит в чате");
@@ -52,15 +54,21 @@ public class ChatService {
     }
 
     public ResponseEntity createChat(ChatCreationDto chatDto) {
+        var jwt = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var targetUserId = jwt.getId();
         ChatEntity chat = modelMapper.map(chatDto, ChatEntity.class);
+        chat.setAdminId(targetUserId);
+        chat.setIsPrivate(false);
         chatRepository.save(chat);
         for (UUID userId : chatDto.getUsers()) {
-            ChatUserEntity chatUser = new ChatUserEntity();
-            chatUser.setChat(chat);
-            chatUser.setUserId(userId);
+            ChatUserEntity chatUser = ChatUserEntity.builder()
+                    .chat(chat)
+                    .userId(userId)
+                    .build();
             chatUserRepository.save(chatUser);
         }
-        return ResponseEntity.ok().body(chat.getId().toString());
+        chatUserRepository.save(ChatUserEntity.builder().chat(chat).userId(targetUserId).build());
+        return ResponseEntity.ok().body(chat.getId());
     }
 
 

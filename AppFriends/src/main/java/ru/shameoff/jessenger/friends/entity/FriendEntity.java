@@ -1,9 +1,6 @@
 package ru.shameoff.jessenger.friends.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import ru.shameoff.jessenger.common.BaseEntity;
 
 import javax.persistence.*;
@@ -14,6 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "friends")
 public class FriendEntity extends BaseEntity {
 
@@ -27,12 +25,3 @@ public class FriendEntity extends BaseEntity {
     @Column(nullable = false)
     private String friendFullName;
 }
-/*
-Друзья
-
-Идентификатор целевого пользователя (к которому добавляются друзья)
-Идентификатор добавляемого пользователя
-ФИО внешнего пользователя
-Дата добавления друга (заполняется автоматически)
-Дата удаления друга (заполняется автоматически)
- */

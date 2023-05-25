@@ -1,6 +1,7 @@
 package ru.shameoff.jessenger.common.sharedDto;
 
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.UUID;
@@ -13,6 +14,7 @@ import java.util.UUID;
  */
 
 @Data
+@Builder
 public class NewNotificationDto {
 
     public UUID userId;

@@ -46,7 +46,7 @@ public class FriendsController {
     private final FriendsService friendsService;
     @PostMapping()
     public ResponseEntity retrieveFriends(@RequestBody RetrieveFriendsDto dto) {
-        return friendsService.retrieveFriends(dto);
+        return friendsService.retrieveUserFriends(dto);
     }
 
     @GetMapping("/{userId}")

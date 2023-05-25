@@ -26,8 +26,8 @@ public class BlacklistController {
     private final BlacklistService blacklistService;
 
     @GetMapping("")
-    public ResponseEntity<?> getBlacklist() {
-        return blacklistService.retrieveTargetUserBlacklist();
+    public ResponseEntity<?> retrieveBlacklist() {
+        return blacklistService.retrieveUserBlacklist();
     }
     @GetMapping("/{userId}/check")
     public ResponseEntity<?> isInBlacklist(@PathVariable UUID userId) {

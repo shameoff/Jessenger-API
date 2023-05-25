@@ -18,7 +18,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class NewMessageDto {
 
-        private UUID receiverId;
         private UUID chatId;
         private String text;
         private String[] attachments;

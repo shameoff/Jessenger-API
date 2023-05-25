@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface FriendsRepository extends JpaRepository<FriendEntity, UUID> {
-    public List<FriendEntity> findAllByUserId(UUID targetUserId);
+    List<FriendEntity> findAllByUserId(UUID targetUserId);
+    List<FriendIdProjection> findAllFriendIdsByUserId(UUID targetUserId);
+    FriendEntity findByUserIdAndFriendId(UUID targetUserId, UUID friendId);
 
-    public FriendEntity findByUserIdAndFriendId(UUID targetUserId, UUID friendId);
+    Boolean existsByUserIdAndFriendId(UUID userId, UUID friendId);
 }

@@ -7,7 +7,6 @@ import lombok.NonNull;
 import ru.shameoff.jessenger.common.BaseEntity;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -21,7 +20,7 @@ public class BlacklistEntity extends BaseEntity {
     private UUID userId;
     @NonNull
     @Column(nullable = false)
-    private UUID blockedUserId;
+    private UUID blockedId;
     @NonNull
     @Column(nullable = false)
     private String blockedFullName;

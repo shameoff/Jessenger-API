@@ -16,8 +16,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 public class ChatCreationDto {
-
         private String name;
-        private String avatarUuid;
+        private UUID avatarId;
         private UUID[] users;
 }
