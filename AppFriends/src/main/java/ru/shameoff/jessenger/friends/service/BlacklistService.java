@@ -80,6 +80,7 @@ public class BlacklistService {
 
     /**
      * Удаляет у авторизованного пользователя из черного списка внешнего пользователя
+     *
      * @param foreignUserId
      * @return
      */
@@ -96,10 +97,28 @@ public class BlacklistService {
         return ResponseEntity.ok().body("User unblocked");
     }
 
-    public ResponseEntity isInBlacklist(UUID foreignUserId) {
+    /**
+     * Проверяет, находится ли авторизованный пользователь у внешнего пользователя в блэклисте
+     *
+     * @param foreignUserId
+     * @return boolean
+     */
+    public ResponseEntity isBlocked(UUID foreignUserId) {
         var jwtData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var targetUserId = jwtData.getId();
-        var isBlocked = blacklistRepository.existsByUserIdAndBlockedId(targetUserId, foreignUserId);
+        var isBlocked = blacklistRepository.existsByUserIdAndBlockedId(foreignUserId, targetUserId);
+        return ResponseEntity.ok().body(isBlocked);
+    }
+
+    /**
+     * Проверяет, находится ли таргет юзер у внешнего пользователя в блэклисте
+     *
+     * @param targetUserId
+     * @param foreignUserId
+     * @return boolean
+     */
+    public ResponseEntity isBlocked(UUID targetUserId, UUID foreignUserId) {
+        var isBlocked = blacklistRepository.existsByUserIdAndBlockedId(foreignUserId, targetUserId);
         return ResponseEntity.ok().body(isBlocked);
     }
 

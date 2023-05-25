@@ -6,6 +6,7 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.shameoff.jessenger.chat.dto.ChatChangeDto;
 import ru.shameoff.jessenger.chat.dto.ChatCreationDto;
 import ru.shameoff.jessenger.chat.dto.MessageInListDto;
@@ -16,7 +17,10 @@ import ru.shameoff.jessenger.chat.entity.MessageEntity;
 import ru.shameoff.jessenger.chat.repository.ChatRepository;
 import ru.shameoff.jessenger.chat.repository.ChatUserRepository;
 import ru.shameoff.jessenger.chat.repository.MessageRepository;
+import ru.shameoff.jessenger.common.client.FriendsServiceClient;
 import ru.shameoff.jessenger.common.security.JwtUserData;
+import ru.shameoff.jessenger.common.security.props.SecurityProps;
+import ru.shameoff.jessenger.common.sharedDto.NewNotificationDto;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,27 +34,86 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final ChatUserRepository chatUserRepository;
     private final MessageRepository messageRepository;
+    private final FriendsServiceClient friendsServiceClient;
     private final StreamBridge streamBridge;
+    private final SecurityProps props;
 
     // TODO отправление сообщений через streamBridge
+    @Transactional
     public ResponseEntity sendMessage(NewMessageDto messageDto) {
         var jwt = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var targetUserId = jwt.getId();
         if (messageDto.getChatId() != null) {
-            ChatEntity chat = chatRepository.findById(messageDto.getChatId()).orElseThrow(RuntimeException::new);
-            if (chat.getUsers().stream().noneMatch(u -> u.getId().equals(me))) {
-                return ResponseEntity.badRequest().body("Пользователь не состоит в чате");
+            try {
+                ChatEntity chat = chatRepository.findById(messageDto.getChatId()).orElseThrow(RuntimeException::new);
+                if (chat.getUsers().stream().noneMatch(u -> u.getId().equals(targetUserId))) {
+                    return ResponseEntity.badRequest().body("Чат не существует или пользователь в нем не состоит.");
+                }
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body("Чат не существует или пользователь в нем не состоит.");
             }
             MessageEntity message = modelMapper.map(messageDto, MessageEntity.class);
             messageRepository.save(message);
             return ResponseEntity.ok().build();
         } else if (messageDto.getReceiverId() != null) {
-
+            sendPrivateMessage(messageDto);
         }
         MessageEntity message = modelMapper.map(messageDto, MessageEntity.class);
         messageRepository.save(message);
 
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * От имени авторизованного пользователя отправляет сообщение пользователю, ID которого указан в messageDto.
+     * @param messageDto
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> sendPrivateMessage(NewMessageDto messageDto) {
+        var jwt = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var targetUserId = jwt.getId();
+        List<UUID> friendIds = friendsServiceClient.retrieveUserFriends(targetUserId, props.getIntegrationsProps().getApiKey());
+        boolean isBlocked = friendsServiceClient.checkIfBlocked(targetUserId, messageDto.getReceiverId(), props.getIntegrationsProps().getApiKey());
+        if (friendIds.stream().noneMatch(id -> id.equals(messageDto.getReceiverId()))) {
+            return ResponseEntity.badRequest().body("Пользователь отсутствует в списке друзей");
+        } else if (isBlocked) {
+            return ResponseEntity.status(403).body("Пользователь добавил вас в чёрный список");
+        }
+        var chatId = getPrivateChatId(targetUserId, messageDto.getReceiverId());
+        var message = MessageEntity.builder()
+                .messageText(messageDto.getText())
+                .chatId(chatId)
+                .build();
+
+        message = messageRepository.save(message);
+        var notification = NewNotificationDto.builder()
+                .notificationType("NEW_MESSAGE")
+                .notificationText("Пришло новое сообщение от пользователя " + targetUserId)
+                .userId(messageDto.getReceiverId());
+        streamBridge.send("newNotificationEvent-out-0", notification);
+        return ResponseEntity.ok().body("Сообщение отправлено");
+    }
+
+    /**
+     * Пытается найти чат двух пользователей, если не находит, то создаёт его
+     *
+     * @param targetUserId
+     * @param foreignUserId
+     * @return UUID нового или существующего чата
+     */
+    @Transactional
+    public UUID getPrivateChatId(UUID targetUserId, UUID foreignUserId) {
+        var chat = chatUserRepository.findChatByUserIds(targetUserId, foreignUserId);
+        if (chat == null) {
+            chat = ChatEntity.builder().isPrivate(true).build();
+            chat = chatRepository.save(chat);
+            var chatUser1 = new ChatUserEntity(chat, targetUserId);
+            chatUserRepository.save(chatUser1);
+            var chatUser2 = new ChatUserEntity(chat, foreignUserId);
+            chatUserRepository.save(chatUser2);
+        }
+        return chat.getId();
     }
 
     public ResponseEntity createChat(ChatCreationDto chatDto) {

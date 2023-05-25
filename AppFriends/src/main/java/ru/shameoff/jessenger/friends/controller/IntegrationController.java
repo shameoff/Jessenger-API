@@ -15,13 +15,36 @@ public class IntegrationController {
     private final BlacklistService blacklistService;
     private final FriendsService friendsService;
 
+    /**
+     * Возвращает список UUIDов заблокированных пользователем пользователей
+     * @param userId
+     * @return
+     */
     @GetMapping("/blacklist")
     public ResponseEntity<?> retrieveUserBlacklist(@RequestParam(required = true) UUID userId) {
         var result = blacklistService.retrieveUserBlacklist(userId);
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * Проверяет, находится ли таргет юзер у внешнего юзера в чёрном списке
+     *
+     * @param targetUserId
+     * @param foreignUserId
+     * @return
+     */
+    @GetMapping("/is-blocked")
+    public ResponseEntity<?> checkIfBlocked(@RequestParam(required = true) UUID targetUserId, @RequestParam(required = true) UUID foreignUserId) {
+        var result = blacklistService.isBlocked(targetUserId, foreignUserId);
+        return ResponseEntity.ok(result);
+    }
 
+    /**
+     * Возвращает список UUIDов друзей пользователя
+     *
+     * @param userId
+     * @return
+     */
     @GetMapping("/friends")
     public ResponseEntity<?> retrieveUserFriends(@RequestParam(required = true) UUID userId) {
         var result = friendsService.retrieveUserFriendsIds(userId);

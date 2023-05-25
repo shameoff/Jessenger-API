@@ -31,7 +31,7 @@ public class BlacklistController {
     }
     @GetMapping("/{userId}/check")
     public ResponseEntity<?> isInBlacklist(@PathVariable UUID userId) {
-        return blacklistService.isInBlacklist(userId);
+        return blacklistService.isBlocked(userId);
     }
 
     @GetMapping("/{userId}/add")

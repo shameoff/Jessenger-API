@@ -3,6 +3,7 @@ package ru.shameoff.jessenger.chat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 
 import java.util.UUID;
 
@@ -17,8 +18,10 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 public class NewMessageDto {
-
+        private UUID receiverId;
         private UUID chatId;
+        @NonNull
         private String text;
+        @NonNull
         private String[] attachments;
 }

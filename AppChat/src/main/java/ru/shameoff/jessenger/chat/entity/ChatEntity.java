@@ -1,9 +1,6 @@
 package ru.shameoff.jessenger.chat.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import ru.shameoff.jessenger.common.BaseEntity;
 
 import javax.persistence.*;
@@ -15,6 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "chats")
 public class ChatEntity extends BaseEntity {
         @NonNull

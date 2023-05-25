@@ -20,4 +20,7 @@ public interface FriendsServiceClient {
 
     @GetMapping("/integration/blacklist")
     List<UUID> retrieveUserBlacklist(@RequestParam(required = true) UUID userId, @RequestHeader(HEADER_INTEGRATION) String apiKey);
+
+    @GetMapping("/integraion/is-blocked")
+    Boolean checkIfBlocked(@RequestParam(required = true) UUID targetUserId, @RequestParam UUID foreignUserId, @RequestHeader(HEADER_INTEGRATION) String apiKey);
 }
