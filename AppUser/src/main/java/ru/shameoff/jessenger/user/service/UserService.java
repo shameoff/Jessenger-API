@@ -5,10 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,15 +15,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.shameoff.jessenger.common.security.JwtUserData;
+import ru.shameoff.jessenger.common.security.props.SecurityProps;
 import ru.shameoff.jessenger.common.sharedDto.NewNotificationDto;
+import ru.shameoff.jessenger.common.sharedDto.UserDto;
 import ru.shameoff.jessenger.user.dto.EditUserInfoDto;
 import ru.shameoff.jessenger.user.dto.LoginDto;
 import ru.shameoff.jessenger.user.dto.RegisterDto;
-import ru.shameoff.jessenger.common.sharedDto.UserDto;
 import ru.shameoff.jessenger.user.entity.UserEntity;
 import ru.shameoff.jessenger.user.repository.UserRepository;
-import ru.shameoff.jessenger.common.security.JwtUserData;
-import ru.shameoff.jessenger.common.security.props.SecurityProps;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -50,6 +47,7 @@ public class UserService {
     public Boolean ifUserExistsById(UUID userId) {
         return userRepository.existsById(userId);
     }
+
     private String generateToken(UserEntity user) {
         var signKey = Keys.hmacShaKeyFor(securityProps.getJwtTokenProps().getSecret().getBytes(StandardCharsets.UTF_8));
         var expiration = new Date(System.currentTimeMillis() + securityProps.getJwtTokenProps().getExpiration());
@@ -72,10 +70,10 @@ public class UserService {
             var user = userRepository.findByUsername(authentication.getName())
                     .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
             var token = generateToken(user);
-            var notification = new NewNotificationDto();
-            notification.setNotificationText("Успешный вход в систему в " + LocalDateTime.now());
-            notification.setUserId(user.getId());
-            notification.setNotificationType("SUCCESSFUL_LOGIN");
+            var notification = NewNotificationDto.builder()
+                    .userId(user.getId())
+                    .notificationText("Успешный вход в систему в " + LocalDateTime.now())
+                    .notificationType("SUCCESSFUL_LOGIN").build();
             streamBridge.send("newNotificationEvent-out-0", notification);
             return ResponseEntity.ok()
                     .header(HEADER_AUTH, TOKEN_PREFIX + token)
