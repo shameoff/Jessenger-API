@@ -1,3 +1,12 @@
+spring.config.import: classpath:/security-config.yml
+# Эти три тире обозначают, что это мы создаём отдельный YAML файл.
+# Всё это нужно чтобы можно было перезаписывать конфигурацию, подтянутую из security-config.yml
+# Подробнее https://stackoverflow.com/questions/65216091/override-property-with-my-profile-dev-in-spring-boot-2-4
+---
+spring.config.import: classpath:/eureka-config.yml
+---
+
+
 server:
   port: 8013
 app:
@@ -14,6 +23,17 @@ eureka:
     prefer-ip-address: true
 
 spring:
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:8040}
+    username: ${RABBITMQ_USER:admin}
+    password: ${RABBITMQ_PASSWORD:admin}
+  cloud.stream.bindings:
+    newNotificationEvent-in-0:
+      destination: NOTIFICATION_EVENT_NEW_NOTIFICATION
+
+
+
   application:
     name: chat-service
   devtools:

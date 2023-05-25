@@ -2,6 +2,7 @@ package ru.shameoff.jessenger.chat.service;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.shameoff.jessenger.chat.dto.ChatChangeDto;
@@ -27,7 +28,9 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final ChatUserRepository chatUserRepository;
     private final MessageRepository messageRepository;
+    private final StreamBridge streamBridge;
 
+    // TODO отправление сообщений через streamBridge
     public ResponseEntity sendMessage(NewMessageDto messageDto) {
         // ЭТО ПРОСТО ЗАГЛУШКА ДЛЯ ПРОВЕРКИ. ТУТ НАДО УЗНАВАТЬ, КТО ОТПРАВЛЯЕТ СООБЩЕНИЕ ИЗ AUTH КОНТЕКСТА
         NewMessageDto me = new NewMessageDto(UUID.randomUUID(), UUID.randomUUID(), "text", null);

@@ -15,6 +15,15 @@ app:
     current-service: "UserService"
 
 spring:
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:8040}
+    username: ${RABBITMQ_USER:admin}
+    password: ${RABBITMQ_PASSWORD:admin}
+
+  cloud.stream.bindings:
+    newNotificationEvent-out-0:
+      destination: notifications-queue
 
   application:
     name: user-service

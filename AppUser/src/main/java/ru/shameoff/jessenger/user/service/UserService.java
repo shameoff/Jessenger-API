@@ -5,6 +5,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.shameoff.jessenger.common.sharedDto.NewNotificationDto;
 import ru.shameoff.jessenger.user.dto.EditUserInfoDto;
 import ru.shameoff.jessenger.user.dto.LoginDto;
 import ru.shameoff.jessenger.user.dto.RegisterDto;
@@ -24,6 +29,7 @@ import ru.shameoff.jessenger.common.security.JwtUserData;
 import ru.shameoff.jessenger.common.security.props.SecurityProps;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -39,7 +45,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-
+    private final StreamBridge streamBridge;
 
     public Boolean ifUserExistsById(UUID userId) {
         return userRepository.existsById(userId);
@@ -62,12 +68,15 @@ public class UserService {
         try {
             Authentication authentication =
                     new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
-            System.out.println("ТОКЕН НЕ ПРИ ЧЁМ\n" + authentication + " " + authentication.getName() + " " + authentication.getPrincipal() + " " + authentication.getCredentials() + " " + authentication.getAuthorities() + " " + authentication.getDetails() + " " + "\n");
-
             authentication = authenticationManager.authenticate(authentication);
             var user = userRepository.findByUsername(authentication.getName())
                     .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
             var token = generateToken(user);
+            var notification = new NewNotificationDto();
+            notification.setNotificationText("Успешный вход в систему в " + LocalDateTime.now());
+            notification.setUserId(user.getId());
+            notification.setNotificationType("SUCCESSFUL_LOGIN");
+            streamBridge.send("newNotificationEvent-out-0", notification);
             return ResponseEntity.ok()
                     .header(HEADER_AUTH, TOKEN_PREFIX + token)
                     .body(modelMapper.map(user, UserDto.class));
@@ -79,7 +88,6 @@ public class UserService {
 
     @Transactional
     public UserDto retrieveInfo(UUID userId) {
-        System.out.println("ДОШЛИ ДО СЕРВИСА ИНТЕГРАЦИИИИИИ!!!!");
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
         return modelMapper.map(userEntity, UserDto.class);

@@ -1,12 +1,14 @@
 package ru.shameoff.jessenger.friends.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.shameoff.jessenger.common.client.UserServiceClient;
 import ru.shameoff.jessenger.common.security.JwtUserData;
 import ru.shameoff.jessenger.common.security.props.SecurityProps;
+import ru.shameoff.jessenger.common.sharedDto.NewNotificationDto;
 import ru.shameoff.jessenger.friends.entity.BlacklistEntity;
 import ru.shameoff.jessenger.friends.repository.BlacklistRepository;
 
@@ -19,6 +21,7 @@ public class BlacklistService {
     private final BlacklistRepository blacklistRepository;
     private final UserServiceClient userServiceClient;
     private final SecurityProps props;
+    private final StreamBridge streamBridge;
 
     public ResponseEntity<?> retrieveTargetUserBlacklist() {
         var jwtData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -35,7 +38,12 @@ public class BlacklistService {
         newEntry.setUserId(targetUserId);
         newEntry.setBlockedUserId(foreignUserId);
         newEntry.setBlockedFullName(foreignUser.getFullName());
+        var notification = new NewNotificationDto();
+        notification.setNotificationText("Пользователь " + newEntry.getBlockedFullName() + " был добавлен в чёрный список");
+        notification.setUserId(targetUserId);
+        notification.setNotificationType("USER_BLOCKED");
         var blocked = blacklistRepository.save(newEntry);
+        streamBridge.send("newNotificationEvent-out-0", notification);
         return ResponseEntity.ok().body(blocked);
     }
 
@@ -43,6 +51,11 @@ public class BlacklistService {
         var jwtData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var targetUserId = jwtData.getId();
         var entryToDelete = blacklistRepository.findBlacklistEntityByUserIdAndAndBlockedUserId(targetUserId, userId);
+        var notification = new NewNotificationDto();
+        notification.setUserId(targetUserId);
+        notification.setNotificationType("USER_UNBLOCKED");
+        notification.setNotificationText("Пользователь " + entryToDelete.getBlockedFullName() + " был удалён из блэклиста");
+        streamBridge.send("newNotificationEvent-out-0", notification);
         blacklistRepository.delete(entryToDelete);
         return ResponseEntity.ok().body("User unblocked");
     }

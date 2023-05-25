@@ -1,5 +1,6 @@
 package ru.shameoff.jessenger.notifications;
 
+import freemarker.core.Environment;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -17,5 +18,4 @@ public class NotificationsApp {
     public static void main(String[] args) {
         SpringApplication.run(NotificationsApp.class, args);
     }
-
 }

@@ -3,14 +3,14 @@ version: "3.9"
 services:
   db:
     image: postgres:14.1-alpine
-    restart: unless-stopped
     container_name: jessenger_db
-    ports:
-      - "6666:5432"
+    restart: unless-stopped
     environment:
       POSTGRES_USER: "admin"
       POSTGRES_PASSWORD: "admin"
       POSTGRES_DB: "postgres"
+    ports:
+      - "6666:5432"
     volumes:
       - "./postgres_data:/var/lib/postgresql/data"
       - "./init-scripts:/docker-entrypoint-initdb.d"
@@ -29,3 +29,14 @@ services:
         - "8031:9090"
     volumes:
         - "./minio_data:/data"
+
+  rabbitmq:
+    image: rabbitmq:3.11-management-alpine
+    container_name: jessenger_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "admin"
+    ports:
+      - "8040:5672" # The standard AMQP protocol port
+      - "8041:15672" # HTTP management UI
