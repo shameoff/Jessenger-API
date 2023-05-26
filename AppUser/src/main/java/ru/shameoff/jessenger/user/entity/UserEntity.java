@@ -16,6 +16,8 @@ public class UserEntity extends BaseEntity {
     @NonNull
     @Column(nullable = false)
     private String username;
+    @NonNull
+    @Column(nullable = false)
      private String email;
     @NonNull
     @Column(nullable = false)
@@ -31,6 +33,6 @@ public class UserEntity extends BaseEntity {
     @Column
     private String city;
     @Column
-    private UUID avatarUuid;
+    private UUID avatarId;
 
 }

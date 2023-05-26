@@ -92,9 +92,12 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto retrieveInfo() {
-        var jwtUserData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity userEntity = userRepository.findByUsername(jwtUserData.getUsername())
+    public UserDto retrieveInfo(String username) {
+        if (username == null) {
+            var jwtUserData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            username = jwtUserData.getUsername();
+        }
+        UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
         return modelMapper.map(userEntity, UserDto.class);
     }
