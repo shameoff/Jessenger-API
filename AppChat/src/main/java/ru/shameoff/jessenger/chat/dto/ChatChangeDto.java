@@ -22,5 +22,4 @@ public class ChatChangeDto {
     private UUID id;
     private String name;
     private UUID avatarId;
-    private UUID[] users;
 }

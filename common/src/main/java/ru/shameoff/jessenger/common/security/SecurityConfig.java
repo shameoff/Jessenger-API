@@ -76,22 +76,17 @@ public class SecurityConfig {
     }
 
     /**
-     * Метод для проверки пути сервлета
+     * Метод для проверки пути сервлета, проверяет, что сервлет вообще есть, начинается c /root-path и отсутствует в permit-all
      *
      * @param rootPath   паттерн для заданного пути
      * @param ignorePath паттерн(ы) для игнорируемых путей
      * @return {@link RequestMatcher}
      */
     private RequestMatcher createCustomReqMatcher(String rootPath, String... ignorePath) {
-
         return req -> {
-
             var result = Objects.nonNull(req.getServletPath())
                     && req.getServletPath().startsWith(rootPath)
                     && Arrays.stream(ignorePath).noneMatch(item -> req.getServletPath().startsWith(item));
-
-            System.out.println("CЕРВЛЕТ ПУТЬ " + req.getServletPath() + ", НАЧИНАЕТСЯ С " + rootPath + " " + req.getServletPath().startsWith(rootPath)
-                    + "НЕ НАЙДЕН В ПЕРМИТ_АЛЛ " + Arrays.stream(ignorePath).noneMatch(item -> req.getServletPath().startsWith(item)));
             return result;
         };
     }

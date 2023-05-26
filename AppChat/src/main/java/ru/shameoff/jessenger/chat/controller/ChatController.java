@@ -1,6 +1,7 @@
 package ru.shameoff.jessenger.chat.controller;
 
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -14,8 +15,9 @@ import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/chat")
+@RequestMapping("/api/chat")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class ChatController {
 
     private final ChatService chatService;
@@ -25,13 +27,18 @@ public class ChatController {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(printErrors(bindingResult));
         }
-
         if (!hasOneNonNullField(messageDto)) {
             bindingResult.reject("fields.invalid",
                     "Одно и только одно из полей usedId или chatId должно быть заполнено корректным UUID");
             return ResponseEntity.badRequest().body(printErrors(bindingResult));
+        } else if (messageDto.getChatId() != null) {
+            return chatService.sendMessage(messageDto);
+
         }
-        return chatService.sendMessage(messageDto);
+        else if (messageDto.getReceiverId() != null){
+            return chatService.sendPrivateMessage(messageDto);
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("")

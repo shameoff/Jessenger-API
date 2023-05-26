@@ -20,7 +20,7 @@ spring:
     username: ${RABBITMQ_USER:admin}
     password: ${RABBITMQ_PASSWORD:admin}
   cloud.stream.bindings:
-    newNotificationEvent-in-0:
+    newNotificationEvent-out-0:
       destination: notifications-queue
 
   application:

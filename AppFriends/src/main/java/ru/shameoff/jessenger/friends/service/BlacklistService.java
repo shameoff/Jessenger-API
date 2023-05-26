@@ -117,9 +117,9 @@ public class BlacklistService {
      * @param foreignUserId
      * @return boolean
      */
-    public ResponseEntity isBlocked(UUID targetUserId, UUID foreignUserId) {
+    public Boolean isBlocked(UUID targetUserId, UUID foreignUserId) {
         var isBlocked = blacklistRepository.existsByUserIdAndBlockedId(foreignUserId, targetUserId);
-        return ResponseEntity.ok().body(isBlocked);
+        return isBlocked;
     }
 
     public ResponseEntity<?> updateBlockedUser(UUID userId) {

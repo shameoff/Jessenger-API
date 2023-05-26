@@ -34,9 +34,9 @@ public class IntegrationController {
      * @return
      */
     @GetMapping("/is-blocked")
-    public ResponseEntity<?> checkIfBlocked(@RequestParam(required = true) UUID targetUserId, @RequestParam(required = true) UUID foreignUserId) {
+    public Boolean checkIfBlocked(@RequestParam(required = true) UUID targetUserId, @RequestParam(required = true) UUID foreignUserId) {
         var result = blacklistService.isBlocked(targetUserId, foreignUserId);
-        return ResponseEntity.ok(result);
+        return result;
     }
 
     /**

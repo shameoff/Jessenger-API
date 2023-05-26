@@ -9,11 +9,6 @@ spring.config.import: classpath:/eureka-config.yml
 server:
   port: 8011
 
-app:
-
-  test-message:
-    current-service: "UserService"
-
 spring:
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}

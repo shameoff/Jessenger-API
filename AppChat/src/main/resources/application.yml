@@ -9,18 +9,6 @@ spring.config.import: classpath:/eureka-config.yml
 
 server:
   port: 8013
-app:
-  test-message:
-    current-service: "ChatService"
-
-eureka:
-  client:
-    enabled: true
-    fetchRegistry: true
-    serviceUrl:
-      defaultZone: http://localhost:8020/eureka/
-  instance:
-    prefer-ip-address: true
 
 spring:
   rabbitmq:
@@ -29,13 +17,12 @@ spring:
     username: ${RABBITMQ_USER:admin}
     password: ${RABBITMQ_PASSWORD:admin}
   cloud.stream.bindings:
-    newNotificationEvent-in-0:
-      destination: NOTIFICATION_EVENT_NEW_NOTIFICATION
-
-
+    newNotificationEvent-out-0:
+      destination: notifications-queue
 
   application:
     name: chat-service
+
   devtools:
     restart:
       enabled: true

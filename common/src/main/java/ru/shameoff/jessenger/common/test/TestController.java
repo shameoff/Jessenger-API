@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/test")
 public class TestController {
 
-    @Value("${app.test-message.current-service}")
+    @Value("${spring.application.name}")
     String currentService;
     @GetMapping("/message")
     public ResponseEntity<String> retrieveMessage() {

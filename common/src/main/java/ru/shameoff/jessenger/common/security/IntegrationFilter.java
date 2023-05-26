@@ -21,7 +21,6 @@ public class IntegrationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println(apiKey + " СЛЕВА АПИ КЛЮЧ СПРАВА ТО, ЧТО ПРИШЛО В ХЕДЕРЕ" + request.getHeader(HEADER_INTEGRATION));
         if (!Objects.equals(request.getHeader(HEADER_INTEGRATION), apiKey)){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return;
