@@ -7,6 +7,9 @@ import ru.shameoff.jessenger.common.sharedDto.NewNotificationDto;
 import ru.shameoff.jessenger.notifications.entity.NotificationEntity;
 import ru.shameoff.jessenger.notifications.repository.NotificationRepository;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
@@ -22,5 +25,12 @@ public class NotificationService {
                 + newNotificationDto.getUserId());
     }
 
+    public Integer retrieveUnreadMessages() {
+        return notificationRepository.countAllByStatus("NEW");
+    }
 
+    public Integer markNotifications(List<UUID> ids, String status) {
+        notificationRepository.updateNotificationStatusByIds(ids, status);
+        return notificationRepository.countAllByStatus("NEW");
+    }
 }
