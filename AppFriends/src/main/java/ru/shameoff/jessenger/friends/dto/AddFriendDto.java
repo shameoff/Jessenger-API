@@ -3,6 +3,8 @@ package ru.shameoff.jessenger.friends.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.UUID;
+
 /*
 Должен принимать в теле запроса необходимые поля для добавления друга, все поля кроме дат должны быть
 обязательными к заполнению
@@ -15,7 +17,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class AddFriendDto {
 
-    private String userId;
-    private String friendId;
+    private UUID userId;
+    private UUID friendId;
 
 }

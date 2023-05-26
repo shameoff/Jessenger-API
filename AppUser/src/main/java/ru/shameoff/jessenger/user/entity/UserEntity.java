@@ -4,6 +4,7 @@ import lombok.*;
 import ru.shameoff.jessenger.common.BaseEntity;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -11,6 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "users")
 public class UserEntity extends BaseEntity {
     @NonNull
@@ -25,14 +27,12 @@ public class UserEntity extends BaseEntity {
     @NonNull
     @Column(nullable = false)
     private String fullName;
-    @Temporal(TemporalType.DATE)
     @Column
-    private Date birthDate;
+    private LocalDate birthDate;
     @Column
     private String phoneNumber;
     @Column
     private String city;
     @Column
     private UUID avatarId;
-
 }

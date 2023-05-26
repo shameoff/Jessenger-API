@@ -4,8 +4,12 @@ package ru.shameoff.jessenger.user.service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,15 +22,16 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.shameoff.jessenger.common.security.JwtUserData;
 import ru.shameoff.jessenger.common.security.props.SecurityProps;
 import ru.shameoff.jessenger.common.sharedDto.NewNotificationDto;
+import ru.shameoff.jessenger.common.sharedDto.PaginationDto;
 import ru.shameoff.jessenger.common.sharedDto.UserDto;
-import ru.shameoff.jessenger.user.dto.EditUserInfoDto;
-import ru.shameoff.jessenger.user.dto.LoginDto;
-import ru.shameoff.jessenger.user.dto.RegisterDto;
+import ru.shameoff.jessenger.user.dto.*;
 import ru.shameoff.jessenger.user.entity.UserEntity;
 import ru.shameoff.jessenger.user.repository.UserRepository;
+import ru.shameoff.jessenger.user.repository.UserSpecifications;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
@@ -34,6 +39,7 @@ import static ru.shameoff.jessenger.common.security.SecurityConstants.HEADER_AUT
 import static ru.shameoff.jessenger.common.security.SecurityConstants.TOKEN_PREFIX;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserService {
 
@@ -62,6 +68,23 @@ public class UserService {
     }
 
     @Transactional
+    public ResponseEntity<?> register(RegisterRequestDto requestDto) {
+        if (userRepository.existsUserByUsername(requestDto.getUsername())) {
+            return ResponseEntity.badRequest().body("User with this login already exists!");
+        }
+        if (userRepository.existsUserByEmail(requestDto.getEmail())) {
+            return ResponseEntity.badRequest().body("User with this email already exists!");
+        }
+        var user = modelMapper.map(requestDto, UserEntity.class);
+        user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        var registeredUser = userRepository.save(user);
+        var token = generateToken(registeredUser);
+        return ResponseEntity.ok()
+                .header(HEADER_AUTH, TOKEN_PREFIX + token)
+                .body(modelMapper.map(registeredUser, UserDto.class));
+    }
+
+    @Transactional
     public ResponseEntity<?> login(LoginDto loginDto) {
         try {
             Authentication authentication =
@@ -85,14 +108,14 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto retrieveInfo(UUID userId) {
+    public UserDto retrieveUserInfo(UUID userId) {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
         return modelMapper.map(userEntity, UserDto.class);
     }
 
     @Transactional
-    public UserDto retrieveInfo(String username) {
+    public UserDto retrieveUserInfo(String username) {
         if (username == null) {
             var jwtUserData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             username = jwtUserData.getUsername();
@@ -102,30 +125,40 @@ public class UserService {
         return modelMapper.map(userEntity, UserDto.class);
     }
 
-    public ResponseEntity<?> updateInfo(EditUserInfoDto editUserInfoDto) {
+    /** Метод, возвращающий список пользователей
+     *
+     * @param dto параметры пагинации, сортировки и фильтрации
+     * @return список пользователей по заданным критериям и порядку
+     */
+    @Transactional
+    public ResponseEntity<?> retrieveUsers(RetrieveUsersRequest dto) {
+        var sorting = dto.getSortingDto() != null ? dto.getSortingDto().createSortingList() : new ArrayList<Sort.Order>();
+        var pagination = dto.getPaginationDto() != null ? dto.getPaginationDto() : new PaginationDto(0, 10);
+        var spec = dto.getFilterDto() != null ? UserSpecifications.withFilter(dto.getFilterDto()) : null;
+        Pageable pageable = PageRequest.of(
+                pagination.getPage(),
+                pagination.getPageSize(),
+                Sort.by(sorting));
+        var page = userRepository.findAll(spec, pageable).map(userEntity -> modelMapper.map(userEntity, UserDto.class));
+        return ResponseEntity.ok().body(page);
+    }
+
+    /**
+     * Метод, обновляющий информацию о пользователе. Если поле не указано, оно остается прежним
+     *
+     * @param editUserInfoDto
+     * @return
+     */
+    public UserDto updateInfo(EditUserInfoDto editUserInfoDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserData jwtUserData = (JwtUserData) authentication.getPrincipal();
         UserEntity userEntity = userRepository.findByUsername(jwtUserData.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
         modelMapper.map(editUserInfoDto, userEntity);
         var savedUser = userRepository.save(userEntity);
-        return ResponseEntity.ok().body(modelMapper.map(savedUser, UserDto.class));
+        return modelMapper.map(savedUser, UserDto.class);
     }
 
-    @Transactional
-    public ResponseEntity<?> register(RegisterDto registerDto) {
-        if (userRepository.existsUserByUsername(registerDto.getUsername())) {
-            return ResponseEntity.badRequest().body("User with this login already exists!");
-        }
-        if (userRepository.existsUserByEmail(registerDto.getEmail())) {
-            return ResponseEntity.badRequest().body("User with this email already exists!");
-        }
-        var user = modelMapper.map(registerDto, UserEntity.class);
-        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-        var registeredUser = userRepository.save(user);
-        var token = generateToken(registeredUser);
-        return ResponseEntity.ok()
-                .header(HEADER_AUTH, TOKEN_PREFIX + token)
-                .body(modelMapper.map(registeredUser, UserDto.class));
-    }
+
+
 }

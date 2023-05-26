@@ -1,5 +1,6 @@
 package ru.shameoff.jessenger.common;
 
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 
@@ -7,7 +8,10 @@ public class CommonBeans {
 
     @Bean
     public ModelMapper modelMapper() {
-        return new ModelMapper();
+        ModelMapper modelMapper = new ModelMapper();
+        // Настраиваем условие для пропуска null значений
+        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+        return modelMapper;
     }
 
     @Bean

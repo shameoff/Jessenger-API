@@ -77,14 +77,14 @@ public class FriendsService {
         var jwtData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var targetUserId = jwtData.getId();
         var targetUser = userServiceClient.getUserById(targetUserId, props.getIntegrationsProps().getApiKey());
-        var foreignUser = userServiceClient.getUserById(UUID.fromString(addFriendDto.getFriendId()), props.getIntegrationsProps().getApiKey());
+        var foreignUser = userServiceClient.getUserById(addFriendDto.getFriendId(), props.getIntegrationsProps().getApiKey());
         var newEntry = FriendEntity.builder()
                 .userId(targetUserId)
-                .friendId(UUID.fromString(addFriendDto.getFriendId()))
+                .friendId(addFriendDto.getFriendId())
                 .friendFullName(foreignUser.getFullName()).build();
         friendsRepository.save(newEntry);
         var newEntryReversed = FriendEntity.builder()
-                .userId(UUID.fromString(addFriendDto.getFriendId()))
+                .userId(addFriendDto.getFriendId())
                 .friendId(targetUserId)
                 .friendFullName(targetUser.getFullName()).build();
         friendsRepository.save(newEntryReversed);
