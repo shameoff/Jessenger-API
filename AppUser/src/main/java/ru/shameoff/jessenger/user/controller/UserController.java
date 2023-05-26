@@ -72,7 +72,7 @@ public class UserController {
      */
     @Operation(summary = "Возвращает информацию о пользователе по его username. Если параметр не указан, возвращает информацию об авторизованном пользователе", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/profile")
-    public UserDto showProfile(@RequestParam(required = false) String username) {
+    public ResponseEntity<?> showProfile(@RequestParam(required = false) String username) {
         return userService.retrieveUserInfo(username);
     }
 

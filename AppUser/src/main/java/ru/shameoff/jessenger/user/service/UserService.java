@@ -1,6 +1,7 @@
 package ru.shameoff.jessenger.user.service;
 
 
+import feign.FeignException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +20,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import ru.shameoff.jessenger.common.client.FriendsServiceClient;
 import ru.shameoff.jessenger.common.security.JwtUserData;
 import ru.shameoff.jessenger.common.security.props.SecurityProps;
-import ru.shameoff.jessenger.common.sharedDto.NewNotificationDto;
-import ru.shameoff.jessenger.common.sharedDto.PaginationDto;
-import ru.shameoff.jessenger.common.sharedDto.UserDto;
+import ru.shameoff.jessenger.common.sharedDto.*;
 import ru.shameoff.jessenger.user.dto.*;
 import ru.shameoff.jessenger.user.entity.UserEntity;
 import ru.shameoff.jessenger.user.repository.UserRepository;
@@ -49,6 +50,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final StreamBridge streamBridge;
+    private final FriendsServiceClient friendsServiceClient;
 
     public Boolean ifUserExistsById(UUID userId) {
         return userRepository.existsById(userId);
@@ -107,6 +109,11 @@ public class UserService {
         }
     }
 
+    /**
+     * Получение информации о пользователе по userID. Используется в интеграционных запросах
+     * @param userId
+     * @return
+     */
     @Transactional
     public UserDto retrieveUserInfo(UUID userId) {
         UserEntity userEntity = userRepository.findById(userId)
@@ -114,15 +121,26 @@ public class UserService {
         return modelMapper.map(userEntity, UserDto.class);
     }
 
+    /**
+     * Получение информации о пользователе по username
+     * @param username
+     * @return
+     */
     @Transactional
-    public UserDto retrieveUserInfo(String username) {
+    public ResponseEntity<?> retrieveUserInfo(String username) {
+        var jwtUserData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (username == null) {
-            var jwtUserData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             username = jwtUserData.getUsername();
+            UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
+            return ResponseEntity.ok().body(modelMapper.map(userEntity, UserDto.class));
         }
-        UserEntity userEntity = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
-        return modelMapper.map(userEntity, UserDto.class);
+        var targetUserId = jwtUserData.getId();
+        UserEntity foreignUserEntity = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
+        var isBlocked = friendsServiceClient.checkIfBlocked(targetUserId, foreignUserEntity.getId(), securityProps.getIntegrationsProps().getApiKey());
+        if (!isBlocked){
+            return ResponseEntity.ok().body(modelMapper.map(foreignUserEntity, UserDto.class));
+        }
+        return ResponseEntity.status(403).body("Пользователь ограничил доступ к своему профилю");
     }
 
     /** Метод, возвращающий список пользователей
@@ -156,6 +174,7 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
         modelMapper.map(editUserInfoDto, userEntity);
         var savedUser = userRepository.save(userEntity);
+        streamBridge.send("profileUpdateEvent-out-1", modelMapper.map(savedUser, ProfileUpdateEventDto.class));
         return modelMapper.map(savedUser, UserDto.class);
     }
 

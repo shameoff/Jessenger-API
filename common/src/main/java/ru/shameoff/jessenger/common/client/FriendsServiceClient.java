@@ -14,13 +14,34 @@ import static ru.shameoff.jessenger.common.security.SecurityConstants.HEADER_INT
 @FeignClient(name = "friends-service")
 @Repository
 public interface FriendsServiceClient {
-
+    /**
+     * Возвращает блэклист пользователя с ID = userId
+     *
+     * @param userId
+     * @param apiKey ключ интеграционного запрос
+     * @return список UUIDов друзей пользователя
+     */
     @GetMapping("/integration/friends")
     List<UUID> retrieveUserFriends(@RequestParam(required = true) UUID userId, @RequestHeader(HEADER_INTEGRATION) String apiKey);
 
+    /**
+     * Возвращает блэклист пользователя с ID = userId
+     *
+     * @param userId
+     * @param apiKey ключ интеграционного запрос
+     * @return список UUIDов заблокированных пользователем пользователей
+     */
     @GetMapping("/integration/blacklist")
     List<UUID> retrieveUserBlacklist(@RequestParam(required = true) UUID userId, @RequestHeader(HEADER_INTEGRATION) String apiKey);
 
+    /**
+     * Проверка, не находится ли таргет юзер в черном списке внешнего пользователя
+     *
+     * @param targetUserId  проверяемый
+     * @param foreignUserId владелец черного списка
+     * @param apiKey        ключ интеграционного запрос
+     * @return
+     */
     @GetMapping("/integration/is-blocked")
     Boolean checkIfBlocked(@RequestParam(required = true) UUID targetUserId, @RequestParam UUID foreignUserId, @RequestHeader(HEADER_INTEGRATION) String apiKey);
 }

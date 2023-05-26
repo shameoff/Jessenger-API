@@ -19,6 +19,8 @@ spring:
   cloud.stream.bindings:
     newNotificationEvent-out-0:
       destination: notifications-queue
+    profileUpdateEvent-out-1:
+      destination: profile-update-queue
 
   application:
     name: user-service
