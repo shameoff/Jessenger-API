@@ -23,7 +23,7 @@ spring:
       destination: profile-update-queue
 
   application:
-    name: user-service
+    name: users-service
 
   devtools:
     restart:

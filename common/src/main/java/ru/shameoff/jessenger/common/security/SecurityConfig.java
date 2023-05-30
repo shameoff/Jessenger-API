@@ -16,6 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.shameoff.jessenger.common.security.props.SecurityProps;
 
 import java.util.Arrays;
@@ -29,6 +32,23 @@ public class SecurityConfig {
     private final SecurityProps securityProps;
 
     /**
+     * TODO Настроить CORS корректным образом
+     * Конфигурация, разрешающая отправлять любые запросы с любого адреса.
+     * Приемлемо только во время разработки
+     * @return
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Настроить разрешение CORS для эндпоинта /v3/api-docs
+        return source;
+    }
+
+    /**
      * <p>Цепочка для фильтрации запросов с JWT </p>
      * <p></p>
      * Она ловит все запросы, которые начинаются на jwt-rootPath (указан в конфиге)
@@ -38,6 +58,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChainJwt(HttpSecurity http) throws Exception {
         http = http
+                .cors()
+                .and()
                 .requestMatcher(createCustomReqMatcher(
                         securityProps.getJwtTokenProps().getRootPath(),
                         securityProps.getJwtTokenProps().getPermitAll()))
@@ -63,6 +85,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChainIntegration(HttpSecurity http) {
         http = http
+                .cors()
+                .and()
                 .requestMatcher(createCustomReqMatcher(securityProps.getIntegrationsProps().getRootPath()))
                 .addFilterBefore(
                         new IntegrationFilter(securityProps.getIntegrationsProps().getApiKey()),

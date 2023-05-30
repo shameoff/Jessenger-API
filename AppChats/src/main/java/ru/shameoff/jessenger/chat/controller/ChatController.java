@@ -1,6 +1,7 @@
 package ru.shameoff.jessenger.chat.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ public class ChatController {
 
     private final ChatService chatService;
 
+    @Operation(summary = "Отправляет сообщение в чат или пользователю, в зависимости от того, что указано в передаваемом dto")
     @PostMapping("/message")
     public ResponseEntity<?> sendMessage(@Valid @RequestBody NewMessageDto messageDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -41,33 +43,39 @@ public class ChatController {
         return ResponseEntity.badRequest().build();
     }
 
+    @Operation(summary = "Создаёт неприватный чат с указанными параметрами")
     @PostMapping("")
     public ResponseEntity<?> createChat(@Valid @RequestBody ChatCreationDto chatDto, BindingResult bindingResult) {
         return bindingResult.hasErrors() ? ResponseEntity.badRequest().body(printErrors(bindingResult))
                 : chatService.createChat(chatDto);
     }
 
+    @Operation(summary = "Изменяет информацию об указанном чате, но не позволяет удалять участников")
     @PutMapping("")
     public ResponseEntity<?> editChat(@Valid @RequestBody ChatChangeDto chatChangeDto, BindingResult bindingResult) {
         return bindingResult.hasErrors() ? ResponseEntity.badRequest().body(printErrors(bindingResult))
                 : chatService.editChat(chatChangeDto);
     }
 
+    @Operation(summary = "Возвращает информацию о запрашиваемом чате")
     @GetMapping("/{chatId}")
     public ResponseEntity<?> retrieveChatInformation(@PathVariable UUID chatId) {
         return chatService.retrieveChatInformation(chatId);
     }
 
+    @Operation(summary = "Возвращает сообщения из указанного чата")
     @GetMapping("/{chatId}/messages")
     public ResponseEntity<?> retrieveChatMessages(@PathVariable UUID chatId) {
         return chatService.retrieveChatMessages(chatId);
     }
 
+    @Operation(summary = "Возвращает список чатов авторизованного пользователя")
     @GetMapping("")
     public ResponseEntity<?> retrieveChats() {
         return chatService.retrieveChats();
     }
 
+    @Operation(summary = "Выполняет поиск сообщений по переданным параметрам")
     @GetMapping("/search")
     public ResponseEntity<?> findMessages() {
         return chatService.findMessages();

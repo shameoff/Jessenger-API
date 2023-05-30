@@ -14,8 +14,8 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/file")
-public class FileController {
+@RequestMapping("/api/fileserver")
+public class FileserverController {
 
     public final FileService fileService;
 

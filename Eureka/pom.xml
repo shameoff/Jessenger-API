@@ -19,9 +19,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>ru.shameoff</groupId>
-            <artifactId>common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+            <version>${eureka.version}</version>
         </dependency>
     </dependencies>
 </project>

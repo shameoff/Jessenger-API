@@ -13,13 +13,25 @@ import java.util.UUID;
 
 import static ru.shameoff.jessenger.common.security.SecurityConstants.HEADER_INTEGRATION;
 
-@FeignClient(name = "user-service")
+@FeignClient(name = "users-service")
 @Repository
 public interface UserServiceClient {
 
+    /**
+     * Проверяет, существует ли юзер с указанным ID
+     * @param userId
+     * @param apiKey
+     * @return существует или не существует
+     */
     @GetMapping("/integration/users/check")
     Boolean checkUserById(@RequestParam(required = true) UUID userId, @RequestHeader(HEADER_INTEGRATION) String apiKey);
 
+    /**
+     * Получает из UserService информацию о пользователе c id = userId
+     * @param userId
+     * @param apiKey
+     * @return
+     */
     @GetMapping("/integration/users/profile")
     UserDto getUserById(@RequestParam(required = true) UUID userId, @RequestHeader(HEADER_INTEGRATION) String apiKey);
 }

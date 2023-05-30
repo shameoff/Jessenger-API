@@ -21,7 +21,7 @@ spring:
       destination: notifications-queue
 
   application:
-    name: chat-service
+    name: chats-service
 
   devtools:
     restart:

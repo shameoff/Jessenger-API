@@ -16,10 +16,10 @@
 
     <modules>
         <module>common</module>
-        <module>AppUser</module>
+        <module>AppUsers</module>
         <module>AppFriends</module>
         <module>AppGateway</module>
-        <module>AppChat</module>
+        <module>AppChats</module>
         <module>AppNotifications</module>
         <module>swagger-aggregator</module>
         <module>Eureka</module>
@@ -115,6 +115,11 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+                <version>${eureka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
                 <version>${eureka.version}</version>
             </dependency>
             <dependency>
