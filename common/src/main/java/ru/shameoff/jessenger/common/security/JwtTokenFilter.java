@@ -19,11 +19,19 @@ import java.util.UUID;
 import static ru.shameoff.jessenger.common.security.SecurityConstants.HEADER_AUTH;
 import static ru.shameoff.jessenger.common.security.SecurityConstants.TOKEN_PREFIX;
 
+/**
+ * Фильтр, который выполняется при всех запросах, попавших в фильтр цепочки JWT.
+ */
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final String secretKey;
 
+    /**
+     * Фильтр проверяет, есть ли в header запроса JWT токен. И является ли он валидным.
+     * Если всё в порядке, кладёт JwtAuthentication в контекст Spring,
+     * если нет - кидает 401 ошибку.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         var jwt = request.getHeader(HEADER_AUTH);

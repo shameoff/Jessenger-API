@@ -13,6 +13,9 @@ import java.util.UUID;
 Текст уведомления
  */
 
+/**
+ * Используется для отправки уведомлений в сервис уведомлений
+ */
 @Data
 @Builder
 public class NewNotificationDto {

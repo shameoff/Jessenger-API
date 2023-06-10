@@ -5,6 +5,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+
+/**
+ * Используется для обновления профилей в разных микросервисах при обновлении в UserService
+ */
 @Data
 @NoArgsConstructor
 public class ProfileUpdateEventDto {

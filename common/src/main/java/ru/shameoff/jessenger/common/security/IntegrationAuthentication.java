@@ -6,10 +6,8 @@ public class IntegrationAuthentication extends AbstractAuthenticationToken {
 
 
     /**
-     * Creates a token with empty authorities.
-     *
-     * In future realizations it may be changed to add authorities for certain service, but now we just say,
-     * that every service can do everything with others, and we control it only with SecurityConfig
+     * Создаёт токен с пустым списком прав доступа.
+     * В дальнейшем, можно добавить сюда права доступа для каждого сервиса, но сейчас это не первоочередная задача.
      */
     public IntegrationAuthentication() {
         super(null);

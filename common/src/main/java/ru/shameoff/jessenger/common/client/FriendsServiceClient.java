@@ -11,6 +11,9 @@ import java.util.UUID;
 
 import static ru.shameoff.jessenger.common.security.SecurityConstants.HEADER_INTEGRATION;
 
+/**
+ * Клиент, который интегрируется в сервисы, для взаимодействия с сервисом друзей
+ */
 @FeignClient(name = "friends-service")
 @Repository
 public interface FriendsServiceClient {

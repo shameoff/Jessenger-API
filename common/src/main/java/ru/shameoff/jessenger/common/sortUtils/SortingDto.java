@@ -1,7 +1,6 @@
-package ru.shameoff.jessenger.common.utils;
+package ru.shameoff.jessenger.common.sortUtils;
 
 import org.springframework.data.domain.Sort;
-import ru.shameoff.jessenger.common.sharedDto.SortingParam;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -14,14 +13,13 @@ import java.util.stream.Collectors;
 import static org.springframework.util.StringUtils.capitalize;
 
 /**
- * Класс, который должны наследовать все SortingDto, чтобы иметь возможность автоматически создавать список для Sort.by()
+ * Класс, наследуемый всеми SortingDto, чтобы иметь возможность автоматически создавать список для Sort.by()
  */
 public abstract class SortingDto {
 
     /**
      * Метод для получения порядка и направлений сортировки, которые пойдут в Sort.by()
-     * <p></p>
-     * Он использует рефлексию
+     * Использует рефлексию, чтобы автоматически собирать поля для возможной сортировки.
      *
      * @return {@link List}<{@link Sort.Order}>
      */

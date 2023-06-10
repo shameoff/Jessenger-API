@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Используется в запросах с пагинацией как объект для управления пагинацией
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

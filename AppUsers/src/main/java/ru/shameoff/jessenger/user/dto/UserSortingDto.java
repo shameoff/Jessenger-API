@@ -1,8 +1,8 @@
 package ru.shameoff.jessenger.user.dto;
 
 import lombok.Data;
-import ru.shameoff.jessenger.common.sharedDto.SortingParam;
-import ru.shameoff.jessenger.common.utils.SortingDto;
+import ru.shameoff.jessenger.common.sortUtils.SortingParam;
+import ru.shameoff.jessenger.common.sortUtils.SortingDto;
 
 @Data
 public class UserSortingDto extends SortingDto {

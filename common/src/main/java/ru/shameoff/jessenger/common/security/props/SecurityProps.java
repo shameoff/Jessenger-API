@@ -6,6 +6,9 @@ import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * Конфигурация, jwt и интеграционных запросов, которая парсится из application.yml
+ */
 @ToString
 @Getter
 @Setter

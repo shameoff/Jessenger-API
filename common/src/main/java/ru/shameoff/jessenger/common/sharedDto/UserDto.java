@@ -6,9 +6,12 @@ import lombok.*;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * DTO для передачи данных пользоватлея между сервисами
+ */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class UserDto {
     @NonNull
     @Schema(example = "abcdefgh-ijkl-mnop-qrst-uvwxyz123456")

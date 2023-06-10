@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
+/**
+ * Класс, в объект которого будет парситься JWT токен
+ */
 @Getter
 @RequiredArgsConstructor
 public class JwtUserData {

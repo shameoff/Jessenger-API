@@ -6,6 +6,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Базовая сущность, которую должны наследовать все сущности в приложении. Создаёт поля id, createdAt, updatedAt, deletedAt и следит за их обновлением
+ */
 @MappedSuperclass
 @Getter
 public abstract class BaseEntity {

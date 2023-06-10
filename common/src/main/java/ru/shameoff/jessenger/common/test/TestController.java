@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Контроллер для тестирования сервисов. Активируется аннотацией {@link EnableTestMessage} над главным классом приложения
+ */
 @RestController
 @RequestMapping("/test")
 public class TestController {

@@ -7,6 +7,9 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Конфигурация OpenAPI 3.0 для генерации Swagger-спецификации
+ */
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "My API", version = "v1"))
 @SecurityScheme(

@@ -1,7 +1,10 @@
-package ru.shameoff.jessenger.common.utils;
+package ru.shameoff.jessenger.common.sortUtils;
 
 import lombok.Getter;
 
+/**
+ * Направление сортировки. Используется в {@link SortingDto}.
+ */
 @Getter
 public enum SortingDirection {
     ASC("Сортировка по возрастанию", "ASCENDING"),

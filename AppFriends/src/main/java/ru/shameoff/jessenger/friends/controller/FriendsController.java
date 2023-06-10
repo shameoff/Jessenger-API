@@ -45,23 +45,23 @@ public class FriendsController {
 
     private final FriendsService friendsService;
     @PostMapping()
-    public ResponseEntity retrieveFriends(@RequestBody RetrieveFriendsDto dto) {
+    public ResponseEntity<?> retrieveFriends(@RequestBody RetrieveFriendsDto dto) {
         return friendsService.retrieveUserFriends(dto);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity retrieveFriendProfile(@PathVariable UUID userId) {
+    public ResponseEntity<?> retrieveFriendProfile(@PathVariable UUID userId) {
         friendsService.retrieveFriendProfile(userId);
         return null;
     }
 
     @PostMapping("/add")
-    public ResponseEntity addFriend(@Valid @RequestBody AddFriendDto addFriendDto) {
+    public ResponseEntity<?> addFriend(@Valid @RequestBody AddFriendDto addFriendDto) {
         return friendsService.addFriend(addFriendDto);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity deleteFriend(@PathVariable UUID userId) {
+    public ResponseEntity<?> deleteFriend(@PathVariable UUID userId) {
         return friendsService.deleteFriend(userId);
     }
 
