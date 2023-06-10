@@ -1,5 +1,6 @@
 package ru.shameoff.jessenger.friends.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -16,8 +17,8 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 public class AddFriendDto {
-
-    private UUID userId;
+    @Schema(example = "uuiduuid-uuid-uuid-uuid-uuiduuuuiduu")
     private UUID friendId;
-
+    @Schema(example = "Example Name")
+    private String friendFullName;
 }

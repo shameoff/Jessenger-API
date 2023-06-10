@@ -1,4 +1,4 @@
-package ru.shameoff.jessenger.common.sortUtils;
+package ru.shameoff.jessenger.common.sortUtil;
 
 import lombok.Getter;
 

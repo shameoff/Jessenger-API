@@ -12,6 +12,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
+@NoArgsConstructor(force = true)
 public class UserDto {
     @NonNull
     @Schema(example = "abcdefgh-ijkl-mnop-qrst-uvwxyz123456")

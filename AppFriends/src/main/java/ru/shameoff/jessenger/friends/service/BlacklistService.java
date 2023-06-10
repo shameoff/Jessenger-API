@@ -103,7 +103,7 @@ public class BlacklistService {
      * @param foreignUserId
      * @return boolean
      */
-    public ResponseEntity isBlocked(UUID foreignUserId) {
+    public ResponseEntity<?> isBlocked(UUID foreignUserId) {
         var jwtData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var targetUserId = jwtData.getId();
         var isBlocked = blacklistRepository.existsByUserIdAndBlockedId(foreignUserId, targetUserId);

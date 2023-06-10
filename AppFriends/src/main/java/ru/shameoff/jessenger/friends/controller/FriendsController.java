@@ -1,5 +1,6 @@
 package ru.shameoff.jessenger.friends.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -44,37 +45,42 @@ POST метод "Поиск"
 public class FriendsController {
 
     private final FriendsService friendsService;
-    @PostMapping()
+    @PostMapping("")
+    @Operation(summary = "Получение списка друзей авторизованного пользователя по указанным параметрам")
     public ResponseEntity<?> retrieveFriends(@RequestBody RetrieveFriendsDto dto) {
         return friendsService.retrieveUserFriends(dto);
     }
 
     @GetMapping("/{userId}")
+    @Operation(summary = "Получение профиля друга по его идентификатору")
     public ResponseEntity<?> retrieveFriendProfile(@PathVariable UUID userId) {
         friendsService.retrieveFriendProfile(userId);
         return null;
     }
 
     @PostMapping("/add")
+    @Operation(summary = "Добавление в друзья внешнего пользователя")
     public ResponseEntity<?> addFriend(@Valid @RequestBody AddFriendDto addFriendDto) {
         return friendsService.addFriend(addFriendDto);
     }
 
     @DeleteMapping("/{userId}")
+    @Operation(summary = "Удаление внешнего пользователя из друзей")
     public ResponseEntity<?> deleteFriend(@PathVariable UUID userId) {
         return friendsService.deleteFriend(userId);
     }
 
     @PostMapping("/search")
-    public ResponseEntity searchFriends(@RequestBody UUID userId) {
+    @Operation(summary = "Поиск друзей по указанным параметрам")
+    public ResponseEntity<?> searchFriends(@RequestBody UUID userId) {
         return friendsService.searchFriends(userId);
     }
 
 
 //    @PatchMapping("/{userId}")
-//    public ResponseEntity updateFriend(@PathVariable UUID userId) {
+//    public ResponseEntity<?> updateFriend(@PathVariable UUID userId) {
 //        return friendsService.updateFriend(userId);
-
+//
 //    }
 
 }

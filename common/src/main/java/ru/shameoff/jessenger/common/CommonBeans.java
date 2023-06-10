@@ -3,6 +3,7 @@ package ru.shameoff.jessenger.common;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
+import ru.shameoff.jessenger.common.exception.GlobalExceptionHandler;
 
 /**
  * Конфигурация бинов, которые используются во всех модулях, но не относятся к Spring Security.
@@ -19,5 +20,8 @@ public class CommonBeans {
     }
 
     @Bean
-    public OpenAPI30Config openApiConfig() {return new OpenAPI30Config();}
+    public OpenAPI30Config openApiConfig() { return new OpenAPI30Config(); }
+
+    @Bean
+    public GlobalExceptionHandler handler() { return new GlobalExceptionHandler();}
 }

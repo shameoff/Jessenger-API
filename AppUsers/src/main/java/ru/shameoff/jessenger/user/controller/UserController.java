@@ -3,10 +3,12 @@ package ru.shameoff.jessenger.user.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.shameoff.jessenger.common.sharedDto.ErrorResponse;
+import ru.shameoff.jessenger.common.exception.BadRequestException;
+import ru.shameoff.jessenger.common.exception.GlobalExceptionHandler;
 import ru.shameoff.jessenger.common.sharedDto.UserDto;
 import ru.shameoff.jessenger.user.dto.EditUserInfoDto;
 import ru.shameoff.jessenger.user.dto.LoginDto;
@@ -15,8 +17,6 @@ import ru.shameoff.jessenger.user.dto.RetrieveUsersRequest;
 import ru.shameoff.jessenger.user.service.UserService;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.UUID;
 
 @RestController
@@ -36,7 +36,10 @@ public class UserController {
     @Operation(summary = "Возвращает UserDto авторизованного пользователя и JWT токен в Authorization Header в случае ввода корректных данных для входа")
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDto loginDto, BindingResult res) {
-        return res.hasErrors() ? ResponseEntity.badRequest().body(returnErrorResponse(res)) : userService.login(loginDto);
+        if (res.hasErrors()) {
+            throw new BadRequestException(getErrorMessages(res));
+        }
+        return userService.login(loginDto);
     }
 
     /**
@@ -48,7 +51,10 @@ public class UserController {
     @Operation(summary = "Регистрирует пользователя. Принимает поля из сущности RegisterDto, возвращает UserDto нового пользователя и JWT токен в Authorization Header  в случае успешной регистрации", security = @SecurityRequirement(name = ""))
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDto requestDto, BindingResult res) {
-        return res.hasErrors() ? ResponseEntity.badRequest().body(returnErrorResponse(res)) : userService.register(requestDto);
+        if (res.hasErrors()) {
+            throw new BadRequestException(getErrorMessages(res));
+        }
+        return userService.register(requestDto);
     }
 
     /**
@@ -60,7 +66,10 @@ public class UserController {
     @Operation(summary = "Изменяет параметры авторизованного пользователя, возвращает UserDto с измененными параметрами", security = @SecurityRequirement(name = "bearerAuth"))
     @PutMapping("/profile")
     public ResponseEntity<?> editProfile(@Valid @RequestBody EditUserInfoDto editUserInfoDto, BindingResult res) {
-        return res.hasErrors() ? ResponseEntity.badRequest().body(returnErrorResponse(res)) : ResponseEntity.ok(userService.updateInfo(editUserInfoDto));
+        if (res.hasErrors()) {
+            throw new BadRequestException(getErrorMessages(res));
+        }
+        return ResponseEntity.ok(userService.updateInfo(editUserInfoDto));
     }
 
 
@@ -72,7 +81,7 @@ public class UserController {
      */
     @Operation(summary = "Возвращает информацию о пользователе по его username. Если параметр не указан, возвращает информацию об авторизованном пользователе", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/profile")
-    public ResponseEntity<?> showProfile(@RequestParam(required = false) String username) {
+    public UserDto showProfile(@RequestParam(required = false) String username) {
         return userService.retrieveUserInfo(username);
     }
 
@@ -88,10 +97,13 @@ public class UserController {
         return userService.retrieveUserInfo(userId);
     }
 
-    @Operation(summary = "Возвращает список пользователей по указанным параметрам с информацией о пагинации", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Возвращает список пользователей по указанным параметрам в запросе", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/list")
-    public ResponseEntity<?> retrieveUsers(@Valid @RequestBody RetrieveUsersRequest dto, BindingResult res) {
-        return res.hasErrors() ? ResponseEntity.badRequest().body(returnErrorResponse(res)) : userService.retrieveUsers(dto);
+    public Page<UserDto> retrieveUsers(@Valid @RequestBody RetrieveUsersRequest dto, BindingResult res) {
+        if (res.hasErrors()) {
+            throw new BadRequestException(getErrorMessages(res));
+        }
+        return userService.retrieveUsers(dto);
     }
 
     /**
@@ -109,15 +121,13 @@ public class UserController {
      * @param bindingResult an object where error logs located
      * @return a string with all errors combined
      */
-    private ErrorResponse returnErrorResponse(BindingResult bindingResult) {
-        HashMap<String, String> messages = new HashMap<>();
+    private String getErrorMessages(BindingResult bindingResult) {
+        StringBuilder builder = new StringBuilder();
         bindingResult.getFieldErrors().forEach(error -> {
             var field = error.getField();
             var message = error.getDefaultMessage();
-            messages.put(field, message);
+            builder.append(field).append(": ").append(message).append("\n");
         });
-        return ErrorResponse.builder()
-                .time(LocalDateTime.now())
-                .messages(messages).build();
+        return builder.toString();
     }
 }

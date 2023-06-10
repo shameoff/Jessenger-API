@@ -1,13 +1,13 @@
 package ru.shameoff.jessenger.user.service;
 
 
-import feign.FeignException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,8 +20,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 import ru.shameoff.jessenger.common.client.FriendsServiceClient;
+import ru.shameoff.jessenger.common.exception.BadRequestException;
+import ru.shameoff.jessenger.common.exception.ForbiddenException;
 import ru.shameoff.jessenger.common.security.JwtUserData;
 import ru.shameoff.jessenger.common.security.props.SecurityProps;
 import ru.shameoff.jessenger.common.sharedDto.*;
@@ -72,10 +73,10 @@ public class UserService {
     @Transactional
     public ResponseEntity<?> register(RegisterRequestDto requestDto) {
         if (userRepository.existsUserByUsername(requestDto.getUsername())) {
-            return ResponseEntity.badRequest().body("User with this login already exists!");
+            throw new BadRequestException("User with this login already exists!");
         }
         if (userRepository.existsUserByEmail(requestDto.getEmail())) {
-            return ResponseEntity.badRequest().body("User with this email already exists!");
+            throw new BadRequestException("User with this email already exists!");
         }
         var user = modelMapper.map(requestDto, UserEntity.class);
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
@@ -93,7 +94,7 @@ public class UserService {
                     new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
             authentication = authenticationManager.authenticate(authentication);
             var user = userRepository.findByUsername(authentication.getName())
-                    .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
+                    .orElseThrow(() -> new BadRequestException("Username not found!"));
             var token = generateToken(user);
             var notification = NewNotificationDto.builder()
                     .userId(user.getId())
@@ -122,25 +123,26 @@ public class UserService {
     }
 
     /**
-     * Получение информации о пользователе по username
-     * @param username
-     * @return
+     * Получение информации о пользователе по username. Использует интеграционный запрос к FriendsService,
+     * чтобы узнать, может ли авторизованный пользователь получать информацию о пользователе с username
+     * @param username - username внешнего пользователя, информацию о котором запрашивает авторизованный пользователь
+     * @return - информация о внешнем пользователе или информация об авторизованном пользователе, если username == null
      */
     @Transactional
-    public ResponseEntity<?> retrieveUserInfo(String username) {
+    public UserDto retrieveUserInfo(String username) {
         var jwtUserData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (username == null) {
             username = jwtUserData.getUsername();
             UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
-            return ResponseEntity.ok().body(modelMapper.map(userEntity, UserDto.class));
+            return modelMapper.map(userEntity, UserDto.class);
         }
         var targetUserId = jwtUserData.getId();
         UserEntity foreignUserEntity = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
         var isBlocked = friendsServiceClient.checkIfBlocked(targetUserId, foreignUserEntity.getId(), securityProps.getIntegrationsProps().getApiKey());
-        if (!isBlocked){
-            return ResponseEntity.ok().body(modelMapper.map(foreignUserEntity, UserDto.class));
+        if (isBlocked){
+            throw new ForbiddenException("Пользователь ограничил доступ к своему профилю");
         }
-        return ResponseEntity.status(403).body("Пользователь ограничил доступ к своему профилю");
+        return modelMapper.map(foreignUserEntity, UserDto.class);
     }
 
     /** Метод, возвращающий список пользователей
@@ -149,30 +151,27 @@ public class UserService {
      * @return список пользователей по заданным критериям и порядку
      */
     @Transactional
-    public ResponseEntity<?> retrieveUsers(RetrieveUsersRequest dto) {
-        var sorting = dto.getSortingDto() != null ? dto.getSortingDto().createSortingList() : new ArrayList<Sort.Order>();
-        var pagination = dto.getPaginationDto() != null ? dto.getPaginationDto() : new PaginationDto(0, 10);
-        var spec = dto.getFilterDto() != null ? UserSpecifications.withFilter(dto.getFilterDto()) : null;
+    public Page<UserDto> retrieveUsers(RetrieveUsersRequest dto) {
+        var sorting = dto.getSorting() != null ? dto.getSorting().createSortingList() : new ArrayList<Sort.Order>();
+        var pagination = dto.getPagination() != null ? dto.getPagination() : new PaginationDto(0, 10);
+        var spec = dto.getFilters() != null ? UserSpecifications.withFilter(dto.getFilters()) : null;
         Pageable pageable = PageRequest.of(
                 pagination.getPage(),
                 pagination.getPageSize(),
                 Sort.by(sorting));
-        var page = userRepository.findAll(spec, pageable).map(userEntity -> modelMapper.map(userEntity, UserDto.class));
-        return ResponseEntity.ok().body(page);
+        return userRepository.findAll(spec, pageable).map(userEntity -> modelMapper.map(userEntity, UserDto.class));
     }
 
     /**
      * Метод, обновляющий информацию о пользователе. Если поле не указано, оно остается прежним
-     *
-     * @param editUserInfoDto
-     * @return
+     * @param dto информация о пользователе, которую следует изменить
      */
-    public UserDto updateInfo(EditUserInfoDto editUserInfoDto) {
+    public UserDto updateInfo(EditUserInfoDto dto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserData jwtUserData = (JwtUserData) authentication.getPrincipal();
         UserEntity userEntity = userRepository.findByUsername(jwtUserData.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
-        modelMapper.map(editUserInfoDto, userEntity);
+                .orElseThrow(() -> new BadRequestException("Username not found!"));
+        modelMapper.map(dto, userEntity);
         var savedUser = userRepository.save(userEntity);
         streamBridge.send("profileUpdateEvent-out-1", modelMapper.map(savedUser, ProfileUpdateEventDto.class));
         return modelMapper.map(savedUser, UserDto.class);

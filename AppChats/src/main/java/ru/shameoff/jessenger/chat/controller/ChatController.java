@@ -11,6 +11,7 @@ import ru.shameoff.jessenger.chat.dto.ChatChangeDto;
 import ru.shameoff.jessenger.chat.dto.ChatCreationDto;
 import ru.shameoff.jessenger.chat.dto.NewMessageDto;
 import ru.shameoff.jessenger.chat.service.ChatService;
+import ru.shameoff.jessenger.common.exception.BadRequestException;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -32,7 +33,7 @@ public class ChatController {
         if (!hasOneNonNullField(messageDto)) {
             bindingResult.reject("fields.invalid",
                     "Одно и только одно из полей usedId или chatId должно быть заполнено корректным UUID");
-            return ResponseEntity.badRequest().body(printErrors(bindingResult));
+            throw new BadRequestException(printErrors(bindingResult));
         } else if (messageDto.getChatId() != null) {
             return chatService.sendMessage(messageDto);
 
