@@ -3,10 +3,12 @@ package ru.shameoff.jessenger.friends.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.shameoff.jessenger.friends.dto.AddFriendDto;
-import ru.shameoff.jessenger.friends.dto.RetrieveFriendsDto;
+import ru.shameoff.jessenger.friends.dto.FriendDto;
+import ru.shameoff.jessenger.friends.dto.RetrieveFriendsRequest;
 import ru.shameoff.jessenger.friends.service.FriendsService;
 
 import javax.validation.Valid;
@@ -46,34 +48,28 @@ public class FriendsController {
 
     private final FriendsService friendsService;
     @PostMapping("")
-    @Operation(summary = "Получение списка друзей авторизованного пользователя по указанным параметрам")
-    public ResponseEntity<?> retrieveFriends(@RequestBody RetrieveFriendsDto dto) {
+    @Operation(summary = "Получение списка друзей авторизованного пользователя по указанным параметрам",
+            description = "Также прямо заменяет эндпоинт поиска, так как поиск осуществляется по фильтрам данного запроса")
+    public Page<FriendDto> retrieveFriends(@RequestBody RetrieveFriendsRequest dto) {
         return friendsService.retrieveUserFriends(dto);
     }
 
     @GetMapping("/{userId}")
     @Operation(summary = "Получение профиля друга по его идентификатору")
-    public ResponseEntity<?> retrieveFriendProfile(@PathVariable UUID userId) {
-        friendsService.retrieveFriendProfile(userId);
-        return null;
+    public FriendDto retrieveFriendProfile(@PathVariable UUID userId) {
+        return friendsService.retrieveFriendProfile(userId);
     }
 
     @PostMapping("/add")
     @Operation(summary = "Добавление в друзья внешнего пользователя")
-    public ResponseEntity<?> addFriend(@Valid @RequestBody AddFriendDto addFriendDto) {
-        return friendsService.addFriend(addFriendDto);
+    public void addFriend(@Valid @RequestBody AddFriendDto addFriendDto) {
+        friendsService.addFriend(addFriendDto);
     }
 
     @DeleteMapping("/{userId}")
     @Operation(summary = "Удаление внешнего пользователя из друзей")
-    public ResponseEntity<?> deleteFriend(@PathVariable UUID userId) {
-        return friendsService.deleteFriend(userId);
-    }
-
-    @PostMapping("/search")
-    @Operation(summary = "Поиск друзей по указанным параметрам")
-    public ResponseEntity<?> searchFriends(@RequestBody UUID userId) {
-        return friendsService.searchFriends(userId);
+    public void deleteFriend(@PathVariable UUID userId) {
+        friendsService.deleteFriend(userId);
     }
 
 

@@ -2,10 +2,8 @@ package ru.shameoff.jessenger.user.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.domain.Page;
 import ru.shameoff.jessenger.common.sharedDto.PaginationDto;
 import ru.shameoff.jessenger.common.sharedDto.UserDto;
-import ru.shameoff.jessenger.user.entity.UserEntity;
 
 import java.util.List;
 
@@ -13,6 +11,6 @@ import java.util.List;
 @Builder
 public class RetrieveUsersResponse {
     private List<UserDto> users;
-    private PaginationDto paginationDto;
-    private UserSortingDto sortingDto;
+    private PaginationDto pagination;
+    private UserSortingDto sorting;
 }

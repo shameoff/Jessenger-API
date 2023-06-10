@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaginationDto {
-    @Schema(example = "1", description = "Номер страницы. Нумерация с 1. если поле пустое - вызывается первая страница")
+    @Schema(example = "0", description = "Номер страницы. Нумерация с 0. если поле пустое - вызывается первая страница")
     private Integer page;
     @Schema(example = "10", description = "Количество элементов на странице")
     private Integer pageSize;

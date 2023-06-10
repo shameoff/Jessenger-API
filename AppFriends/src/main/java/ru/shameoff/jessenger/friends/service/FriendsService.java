@@ -3,6 +3,10 @@ package ru.shameoff.jessenger.friends.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,9 +17,10 @@ import ru.shameoff.jessenger.common.security.props.SecurityProps;
 import ru.shameoff.jessenger.common.sharedDto.NewNotificationDto;
 import ru.shameoff.jessenger.friends.dto.AddFriendDto;
 import ru.shameoff.jessenger.friends.dto.FriendDto;
-import ru.shameoff.jessenger.friends.dto.RetrieveFriendsDto;
+import ru.shameoff.jessenger.friends.dto.RetrieveFriendsRequest;
 import ru.shameoff.jessenger.friends.entity.FriendEntity;
 import ru.shameoff.jessenger.friends.repository.FriendIdProjection;
+import ru.shameoff.jessenger.friends.repository.FriendSpecifications;
 import ru.shameoff.jessenger.friends.repository.FriendsRepository;
 
 import java.util.List;
@@ -33,58 +38,64 @@ public class FriendsService {
 
     /**
      * Получение списка UUIDов друзей пользователя по его id
-     *
      * @param userId UUID пользователя
      * @return список UUIDов друзей
      */
-    public List<UUID>  retrieveUserFriendsIds(UUID userId) {
+    public List<UUID> retrieveUserFriendsIds(UUID userId) {
         return friendsRepository.findAllFriendIdsByUserId(userId).stream().map(FriendIdProjection::getFriendId).collect(Collectors.toList());
     }
 
     /**
-     * Получение списка друзей авторизованного пользователя
-     *
-     * @param {@link RetrieveFriendsDto} принимаемые значения для поиска
+     * Получение списка друзей авторизованного пользователя с пагинацией и фильтрацией
+     * @param dto принимаемые значения для поиска(пагинация и фильтрация)
      * @return список друзей
      */
-    public ResponseEntity<?> retrieveUserFriends(RetrieveFriendsDto dto) {
+    public Page<FriendDto> retrieveUserFriends(RetrieveFriendsRequest dto) {
         var jwtData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var targetUserId = jwtData.getId();
-        List<FriendDto> friends = friendsRepository.findAllByUserId(targetUserId)
-                .stream().map(friend -> {
+        Pageable pageable = PageRequest.of(
+                dto.getPagination().getPage(),
+                dto.getPagination().getPageSize());
+        var spec = dto.getFilterDto() != null ? FriendSpecifications.withFilter(dto.getFilterDto(), targetUserId) : null;
+        return friendsRepository.findAll(spec, pageable)
+                .map(friend -> {
                     var friendDto = modelMapper.map(friend, FriendDto.class);
                     friendDto.setAdded_at(friend.getCreatedAt());
                     return friendDto;
-                }).collect(Collectors.toList());
-        return ResponseEntity.ok().body(friends);
+                });
     }
 
     /**
      * Возвращает о друге все поля из сущности друзей
-     *
-     * @param friendId
-     * @return
      */
-    public ResponseEntity retrieveFriendProfile(UUID friendId) {
+    public FriendDto retrieveFriendProfile(UUID friendId) {
         var jwtData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var targetUserId = jwtData.getId();
-        var entry = friendsRepository.findByUserIdAndFriendId(targetUserId, friendId);
-        return ResponseEntity.ok().body(entry);
+        var friendEntity = friendsRepository.findByUserIdAndFriendId(targetUserId, friendId);
+        return FriendDto.builder()
+                .friendId(friendEntity.getFriendId())
+                .friendFullName(friendEntity.getFriendFullName())
+                .added_at(friendEntity.getCreatedAt()).build();
+
     }
 
+    /**
+     * Добавление друга в список друзей авторизованного пользователя
+     * @param dto DTO с данными пользователя, которого нужно добавить в друзья
+     */
     @Transactional
-    public ResponseEntity addFriend(AddFriendDto addFriendDto) {
+    public void addFriend(AddFriendDto dto) {
         var jwtData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var targetUserId = jwtData.getId();
         var targetUser = userServiceClient.getUserById(targetUserId, props.getIntegrationsProps().getApiKey());
-        var foreignUser = userServiceClient.getUserById(addFriendDto.getFriendId(), props.getIntegrationsProps().getApiKey());
+        var foreignUser = userServiceClient.getUserById(dto.getFriendId(), props.getIntegrationsProps().getApiKey());
         var newEntry = FriendEntity.builder()
                 .userId(targetUserId)
-                .friendId(addFriendDto.getFriendId())
+                .friendId(dto.getFriendId())
                 .friendFullName(foreignUser.getFullName()).build();
         friendsRepository.save(newEntry);
         var newEntryReversed = FriendEntity.builder()
-                .userId(addFriendDto.getFriendId())
+                .userId(dto.getFriendId())
                 .friendId(targetUserId)
                 .friendFullName(targetUser.getFullName()).build();
         friendsRepository.save(newEntryReversed);
@@ -93,11 +104,14 @@ public class FriendsService {
                 .userId(targetUserId)
                 .notificationType("FRIEND_ADDED").build();
         streamBridge.send("newNotificationEvent-out-0", notification);
-        return ResponseEntity.ok().body("Friend added");
     }
 
+    /**
+     * Удаление пользователя из друзей по его id
+     * @param foreignUserId UUID пользователя, которого нужно удалить из друзей
+     */
     @Transactional
-    public ResponseEntity deleteFriend(UUID foreignUserId) {
+    public void deleteFriend(UUID foreignUserId) {
         var jwtData = (JwtUserData) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var targetUserId = jwtData.getId();
         var entryToDelete = friendsRepository.findByUserIdAndFriendId(targetUserId, foreignUserId);
@@ -109,10 +123,5 @@ public class FriendsService {
         streamBridge.send("newNotificationEvent-out-0", notification);
         friendsRepository.delete(entryToDelete);
         friendsRepository.delete(entryToDeleteReversed);
-        return ResponseEntity.ok().body("Friend deleted");
-    }
-
-    public ResponseEntity searchFriends(UUID userId) {
-        return null;
     }
 }

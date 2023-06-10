@@ -5,9 +5,7 @@ import ru.shameoff.jessenger.user.dto.UserFilterDto;
 import ru.shameoff.jessenger.user.entity.UserEntity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class UserSpecifications {

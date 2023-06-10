@@ -37,13 +37,13 @@ public class BlacklistController {
         return blacklistService.isBlocked(userId);
     }
 
-    @GetMapping("/{userId}/add")
+    @PostMapping("/{userId}/add")
     @Operation(summary = "Добавление в черный список внешнего пользователя")
     public void addToBlacklist(@PathVariable UUID userId) {
            blacklistService.blockUser(userId);
     }
 
-    @GetMapping("/{userId}/delete")
+    @DeleteMapping("/{userId}/delete")
     @Operation(summary = "Удаление из черного списка внешнего пользователя")
     public void deleteFromBlacklist(@PathVariable UUID userId) {
         blacklistService.unblockUser(userId);
