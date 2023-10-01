@@ -1,7 +1,111 @@
 version: "3.9"
 
 services:
-  db:
+
+  app:
+    image: alpine
+    restart: unless-stopped
+    environment:
+      - EUREKA_HOST
+      - EUREKA_PORT=8761 # don't change
+      - APP_PORT=8080
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - S3_HOST
+      - S3_PORT=9000 # don't change
+    expose:
+      - 8080
+    depends_on:
+      - eureka
+
+  app-chats:
+    environment:
+      - DB_USER=chat_user
+      - DB_PASSWORD=chat_password
+      - DB_DB=chat_db
+    extends:
+      service: app
+    image: jessenger/app-chats:0.0.1-SNAPSHOT
+    restart: unless-stopped
+    ports:
+      - "6662:8080"
+
+  app-fileserver:
+    environment:
+      - DB_USER=fileserver_user
+      - DB_PASSWORD=fileserver_password
+      - DB_DB=fileserver_db
+    extends:
+      service: app
+    image: jessenger/app-fileserver:0.0.1-SNAPSHOT
+    restart: unless-stopped
+    ports:
+      - "6661:8080"
+
+  app-friends:
+    environment:
+      - DB_USER=user_user
+      - DB_PASSWORD=user_password
+      - DB_DB=user_db
+    extends:
+      service: app
+    image: jessenger/app-friends:0.0.1-SNAPSHOT
+    restart: unless-stopped
+    ports:
+      - "6669:8080"
+
+  app-gateway:
+    image: jessenger/app-gateway:0.0.1-SNAPSHOT
+    extends:
+      service: app
+    restart: unless-stopped
+
+  app-notifications:
+    environment:
+      - DB_USER=user_user
+      - DB_PASSWORD=user_password
+      - DB_DB=user_db
+    extends:
+      service: app
+    image: jessenger/app-notifications:0.0.1-SNAPSHOT
+    restart: unless-stopped
+    ports:
+      - "6668:8080"
+
+  app-users:
+    environment:
+      - DB_USER=user_user
+      - DB_PASSWORD=user_password
+      - DB_DB=user_db
+    extends:
+      service: app
+    image: jessenger/app-users:0.0.1-SNAPSHOT
+    restart: unless-stopped
+    ports:
+      - "6666:8080"
+
+  eureka:
+    image: jessenger/eureka:0.0.1-SNAPSHOT
+    hostname: eureka
+    environment:
+      - EUREKA_HOST
+      - EUREKA_PORT
+    restart: unless-stopped
+    ports:
+      - "6667:${EUREKA_PORT:-8761}"
+
+#  swagger-aggregator:
+#    build:
+#      context: .
+#      args:
+#        - SERVICE=swagger-aggregator
+#        - APP_PORT=8080
+#    restart: unless-stopped
+
+  postgres:
+    hostname: ${POSTGRES_HOST:-postgres}
     image: postgres:14.1-alpine
     container_name: jessenger_db
     restart: unless-stopped
@@ -10,12 +114,13 @@ services:
       POSTGRES_PASSWORD: "admin"
       POSTGRES_DB: "postgres"
     ports:
-      - "6666:5432"
+      - "15432:5432"
     volumes:
       - "./postgres_data:/var/lib/postgresql/data"
       - "./init-scripts:/docker-entrypoint-initdb.d"
 
-  fileserver:
+  minio:
+    hostname: ${S3_HOST:-minio}
     image: minio/minio:latest
     container_name: jessenger_fileserver
     command: minio server /data
@@ -31,12 +136,19 @@ services:
         - "./minio_data:/data"
 
   rabbitmq:
+    hostname: ${RABBITMQ_HOST:-rabbitmq}
     image: rabbitmq:3.11-management-alpine
     container_name: jessenger_rabbitmq
     restart: unless-stopped
     environment:
-      RABBITMQ_DEFAULT_USER: "admin"
-      RABBITMQ_DEFAULT_PASS: "admin"
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     ports:
       - "8040:5672" # The standard AMQP protocol port
       - "8041:15672" # HTTP management UI
+
+  inspector:
+    image: alpine:latest  # Используем базовый образ Alpine Linux
+    command: sh -c "apk update && apk add curl && /bin/sh"  # Запустим интерактивную оболочку
+    stdin_open: true  # Разрешить ввод с клавиатуры
+    tty: true  # Задействовать псевдотерминал

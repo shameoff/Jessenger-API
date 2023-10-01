@@ -3,13 +3,13 @@ eureka:
   client:
     enabled: true
     service-url:
-      defaultZone: http://localhost:8020/eureka/
+      defaultZone: http://${EUREKA_HOST:eureka}:${EUREKA_PORT:8080}/eureka/
   instance:
     prefer-ip-address: true
 ---
 
 server:
-  port: 8021
+  port: ${APP_PORT:8080}
 
 app:
   test-message:

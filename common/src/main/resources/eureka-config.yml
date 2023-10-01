@@ -2,6 +2,6 @@ eureka:
   client:
     enabled: true
     service-url:
-      defaultZone: http://localhost:8020/eureka/
+      defaultZone: http://${EUREKA_HOST:eureka}:${EUREKA_PORT:8761}/eureka/
   instance:
     prefer-ip-address: true

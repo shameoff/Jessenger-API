@@ -16,14 +16,14 @@
 
     <modules>
         <module>common</module>
-        <module>AppUsers</module>
-        <module>AppFriends</module>
-        <module>AppGateway</module>
-        <module>AppChats</module>
-        <module>AppNotifications</module>
+        <module>app-users</module>
+        <module>app-friends</module>
+        <module>app-gateway</module>
+        <module>app-chats</module>
+        <module>app-notifications</module>
         <module>swagger-aggregator</module>
-        <module>Eureka</module>
-        <module>AppFileserver</module>
+        <module>eureka</module>
+        <module>app-fileserver</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -48,6 +48,7 @@
         <spring-cloud-stream.version>4.0.1</spring-cloud-stream.version>
         <spring-cloud-amqp.version>3.0.4</spring-cloud-amqp.version>
         <h2.version>2.1.214</h2.version>
+        <image>jessenger/${artifactId}:${project.version}</image>
     </properties>
 
     <dependencyManagement>
@@ -201,5 +202,37 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.google.cloud.tools</groupId>
+                    <artifactId>jib-maven-plugin</artifactId>
+                    <version>2.7.1</version>
+                    <configuration>
+                        <!--                        <to>-->
+                        <!--                            <image>docker.io/shameoff/jessenger-api</image>-->
+                        <!--                        </to>-->
+                        <!--                        <container>-->
+                        <!--                            <environment>-->
+                        <!--                                <APP_NAME></APP_NAME>-->
+                        <!--                                <SERVICE></SERVICE>-->
+                        <!--                                <DB_USER></DB_USER>-->
+                        <!--                                <DB_PASSWORD></DB_PASSWORD>-->
+                        <!--                                <DB_HOST></DB_HOST>-->
+                        <!--                                <DB_PORT></DB_PORT>-->
+                        <!--                                <S3_USER></S3_USER>-->
+                        <!--                                <S3_PASSWORD></S3_PASSWORD>-->
+                        <!--                                <S3_HOST></S3_HOST>-->
+                        <!--                                <S3_PORT></S3_PORT>-->
+
+                        <!--                            </environment>-->
+                        <!--                        </container>-->
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>

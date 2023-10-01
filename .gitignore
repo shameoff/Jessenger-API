@@ -37,7 +37,7 @@ build/
 /postgres_data
 
 ### env data ###
-.env
+common.env
 
 ### minioclient ###
 /minio_config

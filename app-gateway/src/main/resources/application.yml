@@ -1,0 +1,52 @@
+---
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://localhost:8020/eureka/
+  instance:
+    prefer-ip-address: true
+---
+
+server:
+  port: ${$APP_PORT:8010}
+
+springdoc:
+  swagger-ui:
+    configUrl: "/swagger-config.json"
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: swagger
+          uri: http://localhost:8021/
+          predicates:
+            - Path=/api/swagger/**
+
+        - id: users-service
+          uri: http://localhost:8011/api/users/
+          predicates:
+            - Path=/api/users/**
+
+        - id: friends-service
+          uri: http://localhost:8012/
+          predicates:
+            - Path=/api/friends/**
+
+        - id: chats-service
+          uri: http://localhost:8013/
+          predicates:
+            - Path=/api/chat/**
+
+        - id: notifications-service
+          uri: http://localhost:8014/
+          predicates:
+            - Path=/api/notif/**
+
+        - id: fileserver-service
+          uri: http://localhost:8015/
+          predicates:
+            - Path=/api/fileserver/**

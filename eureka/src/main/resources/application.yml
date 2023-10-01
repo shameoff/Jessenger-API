@@ -1,0 +1,21 @@
+server:
+  port: ${EUREKA_PORT:8761}
+
+eureka:
+  client:
+    register-with-eureka: off
+    fetch-registry: off
+  instance:
+    hostname: ${EUREKA_HOST:eureka}
+
+
+spring:
+  application:
+    name: eureka
+  devtools:
+    restart:
+      enabled: true
+  mvc: # Чтобы работали HTTP методы PUT, PATCH, DELETE
+    hiddenmethod:
+      filter:
+        enabled: true
